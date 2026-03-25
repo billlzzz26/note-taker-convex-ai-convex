@@ -18,7 +18,12 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Skills files: skills/note-management.md, skills/response-format.md
 - [x] API routes: /api/notes/route.ts
 - [x] TypeScript typecheck passes
-- [x] ESLint passes
+- [x] ESLint passes (warnings only)
+- [x] Tests pass (10/10)
+- [x] @vitest/ui installed for test UI
+- [x] .env.example created
+- [x] TODO.md created
+- [x] Rule 6 (Always Work Rule) added to project-rules.md
 - [x] Build passes
 - [x] Mobile-first UI/UX rules created
 - [x] shadcn/ui setup (Button, Card, Input components)
@@ -76,5 +81,9 @@ The Note Taker app is complete and ready for deployment. Users need to:
 ## Pending Items
 
 - [x] Run `npx convex dev` to set up Convex backend (using CONVEX_DEPLOY_KEY)
+- [x] Create .env.example
+- [x] Install @vitest/ui for test UI
+- [x] Create TODO.md for tracking pending work
+- [x] Add Rule 6 (Always Work Rule) to project-rules.md
 - [ ] Deploy agent to Kilo platform
 - [ ] Configure CONVEX_URL in Kilo dashboard environment variables
