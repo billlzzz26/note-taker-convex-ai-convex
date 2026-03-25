@@ -4,7 +4,7 @@
 
 **Project Status**: ✅ Development in progress
 
-Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind CSS, TypeScript. Three-panel layout implemented with thread sidebar, chat, and notes panel. shadcn/ui components installed.
+Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind CSS, TypeScript. Three-panel layout implemented with thread sidebar, chat, and notes panel. shadcn/ui components installed. Custom modes and subagents configured.
 
 ## Recently Completed
 
@@ -22,6 +22,8 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Build passes
 - [x] Mobile-first UI/UX rules created
 - [x] shadcn/ui setup (Button, Card, Input components)
+- [x] Custom modes configured (7 modes: code-reviewer, docs-specialist, frontend-specialist, test-engineer, education, kilo-settings-assistant, session-learner)
+- [x] Subagents created: file-name-generator, topic-tagger, history-chat-learner
 
 ## Current Structure
 
@@ -47,6 +49,10 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 | `SPEC.md` | Project specification | ✅ Ready |
 | `.kilocode/rules/mobile-first-ui-ux.md` | Mobile-first rules | ✅ Ready |
 | `.kilocode/rules/shadcn-ui.md` | shadcn/ui rules | ✅ Ready |
+| `custom_modes.yaml` | Custom agent modes | ✅ Ready |
+| `.kilocode/subagents/file-name-generator.yaml` | File renaming subagent | ✅ Ready |
+| `.kilocode/subagents/topic-tagger.yaml` | Markdown tagging subagent | ✅ Ready |
+| `.kilocode/subagents/history-chat-learner.yaml` | Session learning subagent | ✅ Ready |
 
 ## Current Focus
 
@@ -60,7 +66,7 @@ The Note Taker app is complete and ready for deployment. Users need to:
 | Date | Changes |
 |------|---------|
 | Initial | Base Next.js template created |
-| Now | Complete Note Taker app with Convex, shadcn/ui, mobile-first rules |
+| Now | Complete Note Taker app with Convex, shadcn/ui, mobile-first rules, custom modes, and subagents |
 
 ## Pending Items
 
