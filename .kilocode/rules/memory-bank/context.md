@@ -75,6 +75,6 @@ The Note Taker app is complete and ready for deployment. Users need to:
 
 ## Pending Items
 
-- [ ] Run `npx convex dev` to set up Convex backend
+- [x] Run `npx convex dev` to set up Convex backend (using CONVEX_DEPLOY_KEY)
 - [ ] Deploy agent to Kilo platform
 - [ ] Configure CONVEX_URL in Kilo dashboard environment variables
