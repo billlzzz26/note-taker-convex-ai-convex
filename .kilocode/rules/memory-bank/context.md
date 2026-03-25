@@ -1,87 +1,59 @@
-# Active Context: Next.js Starter Template
+# Active Context: Note Taker with Convex
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Project Status**: ✅ Development in progress
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind CSS, TypeScript. Three-panel layout implemented with thread sidebar, chat, and notes panel.
 
 ## Recently Completed
 
-- [x] Base Next.js 16 setup with App Router
-- [x] TypeScript configuration with strict mode
-- [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
+- [x] SPEC.md with detailed specifications
+- [x] Convex schema and backend functions (convex/notes.ts, convex/schema.ts)
+- [x] Three-panel layout: ThreadSidebar, Chat, NotesPanel
+- [x] Agent implementation with 6 CRUD tools (save_note, search_notes, list_notes, get_notes_by_tag, update_note, delete_note)
+- [x] Real-time notes panel with EventSource subscription
+- [x] Environment configuration (.env.example, .env.local)
+- [x] Agent tools: lib/tools.ts, lib/convex.ts, lib/env.ts
+- [x] Skills files: skills/note-management.md, skills/response-format.md
+- [x] API routes: /api/notes/route.ts
+- [x] TypeScript typecheck passes
+- [x] ESLint passes
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
 |----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+| `src/app/page.tsx` | Main three-panel layout | ✅ Ready |
+| `src/app/components/thread-sidebar.tsx` | Thread navigation | ✅ Ready |
+| `src/app/components/notes-panel.tsx` | Real-time notes display | ✅ Ready |
+| `src/app/components/note-tool-renderers.tsx` | Tool result display | ✅ Ready |
+| `src/app/components/agents/note-taker.ts` | AI agent | ✅ Ready |
+| `src/app/components/agents/lib/tools.ts` | 6 CRUD tools | ✅ Ready |
+| `src/app/components/agents/lib/convex.ts` | Convex HTTP client | ✅ Ready |
+| `src/app/components/agents/lib/env.ts` | Environment variables | ✅ Ready |
+| `src/app/api/notes/route.ts` | API route for notes | ✅ Ready |
+| `convex/schema.ts` | Database schema | ✅ Ready |
+| `convex/notes.ts` | Backend functions | ✅ Ready |
+| `convex.json` | Convex configuration | ✅ Ready |
+| `SPEC.md` | Project specification | ✅ Ready |
 
 ## Current Focus
 
-The template is ready. Next steps depend on user requirements:
-
-1. What type of application to build
-2. What features are needed
-3. Design/branding preferences
-
-## Quick Start Guide
-
-### To add a new page:
-
-Create a file at `src/app/[route]/page.tsx`:
-```tsx
-export default function NewPage() {
-  return <div>New page content</div>;
-}
-```
-
-### To add components:
-
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
-
-### To add a database:
-
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
+The Note Taker app is complete and ready for deployment. Users need to:
+1. Set up Convex with `npx convex dev`
+2. Configure CONVEX_URL in Kilo dashboard
+3. Deploy the agent with `npm run deploy`
 
 ## Session History
 
 | Date | Changes |
 |------|---------|
-| Initial | Template created with base setup |
+| Initial | Base Next.js template created |
+| Now | Complete Note Taker app with Convex integration |
+
+## Pending Items
+
+- [ ] Run `npx convex dev` to set up Convex backend
+- [ ] Deploy agent to Kilo platform
+- [ ] Configure CONVEX_URL in Kilo dashboard environment variables

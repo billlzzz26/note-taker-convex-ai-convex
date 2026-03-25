@@ -1,18 +1,26 @@
 {
-  "name": "nextjs-template",
+  "name": "note-taker",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:next": "next dev",
+    "dev:convex": "npx convex dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "login": "npx @kilocode/cli login",
+    "deploy": "npx @kilocode/cli deploy"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.48",
+    "ai": "^6.0.138",
+    "convex": "^1.34.0",
     "next": "^16.1.3",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
@@ -22,6 +30,7 @@
     "@tailwindcss/postcss": "^4.1.17",
     "tailwindcss": "^4.1.17",
     "eslint": "^9.39.1",
-    "eslint-config-next": "^16.0.0"
+    "eslint-config-next": "^16.0.0",
+    "@kilocode/cli": "^0.0.6"
   }
 }
