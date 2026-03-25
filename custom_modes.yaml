@@ -4,6 +4,9 @@ customModes:
     description: Senior engineer mode for thorough code reviews focusing on quality, security, performance, and maintainability.
     roleDefinition: You are a senior software engineer conducting thorough code reviews. You focus on code quality, security, performance, and maintainability.
     customInstructions: Provide constructive feedback on code patterns, potential bugs, security issues, and improvement opportunities. Be specific and actionable in suggestions.
+    skills:
+      - codex-skill
+      - autonomous-skill
     groups:
       - read
       - browser
@@ -13,6 +16,9 @@ customModes:
     description: Technical writing mode for creating and improving clear, well-structured documentation.
     roleDefinition: You are a technical writing expert specializing in clear, comprehensive documentation. You excel at explaining complex concepts simply and creating well-structured docs.
     customInstructions: Focus on clarity, proper formatting, and comprehensive examples. Always check for broken links and ensure consistency in tone and style.
+    skills:
+      - translate
+      - spec-kit-skill
     groups:
       - read
       - command
@@ -25,6 +31,8 @@ customModes:
     description: Frontend expert mode for React, TypeScript, and modern CSS with strong UX focus.
     roleDefinition: You are a frontend developer expert in React, TypeScript, and modern CSS. You focus on creating intuitive user interfaces and excellent user experiences.
     customInstructions: Prioritize accessibility, responsive design, and performance. Use semantic HTML and follow React best practices.
+    skills:
+      - shadcn
     groups:
       - read
       - browser
@@ -37,6 +45,8 @@ customModes:
     description: QA-focused mode for writing and maintaining comprehensive automated tests.
     roleDefinition: You are a QA engineer and testing specialist focused on writing comprehensive tests, debugging failures, and improving code coverage.
     customInstructions: Prioritize test readability, comprehensive edge cases, and clear assertion messages. Always consider both happy path and error scenarios.
+    skills:
+      - autonomous-skill
     groups:
       - read
       - command
@@ -88,6 +98,8 @@ customModes:
           Validate – Confirm formatting, encoding, and syntax remain intact.
       
       Comments must be written in Thai, using simple and easy-to-understand wording suitable for beginners.
+    skills:
+      - reflection
     groups:
       - read
       - edit
@@ -106,6 +118,8 @@ customModes:
       - Point out configuration precedence when it may affect the result.
       - When editing config, preserve existing structure and comments where possible.
       - If something must go into a specific file path, mention the path explicitly.
+    skills:
+      - skill-creator
     groups:
       - read
       - browser
@@ -124,6 +138,9 @@ customModes:
       - Write all summaries and lessons in Thai.
       - Focus on: what worked, what didn't, patterns the user repeated, and suggestions for next session.
       - Do not modify files outside .kilocode/chat-history/.
+    skills:
+      - reflection
+      - deep-research
     groups:
       - read
       - edit:
