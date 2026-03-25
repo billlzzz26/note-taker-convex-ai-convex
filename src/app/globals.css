@@ -26,6 +26,26 @@
   --color-chart-3: oklch(0.6 0.2 310);
   --color-chart-4: oklch(0.6 0.2 330);
   --color-chart-5: oklch(0.6 0.2 0);
+  --color-sidebar-background: oklch(0.145 0 0);
+  --color-sidebar-foreground: oklch(0.985 0 0);
+  --color-sidebar-primary: oklch(0.6 0.2 250);
+  --color-sidebar-primary-foreground: oklch(0.985 0 0);
+  --color-sidebar-accent: oklch(0.269 0 0);
+  --color-sidebar-accent-foreground: oklch(0.985 0 0);
+  --color-sidebar-border: oklch(0.269 0 0);
+  --color-sidebar-ring: oklch(0.6 0.2 250);
+  --color-design: oklch(0.6 0.2 250);
+  --color-design-foreground: oklch(0.985 0 0);
+  --color-editorial: oklch(0.6 0.2 280);
+  --color-editorial-foreground: oklch(0.985 0 0);
+  --color-creative: oklch(0.6 0.2 310);
+  --color-creative-foreground: oklch(0.985 0 0);
+  --color-success: oklch(0.6 0.2 160);
+  --color-success-foreground: oklch(0.985 0 0);
+  --color-warning: oklch(0.6 0.2 40);
+  --color-warning-foreground: oklch(0.985 0 0);
+  --color-info: oklch(0.6 0.2 220);
+  --color-info-foreground: oklch(0.985 0 0);
 }
 
 @layer base {
