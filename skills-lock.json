@@ -1,10 +1,80 @@
 {
   "version": 1,
   "skills": {
+    "autonomous-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "7e17712aab874c295063188d8430184abbefab2a935b3fc412a91b2e1f01fbc3"
+    },
+    "codex-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "4b220a2074eebc095976b6797fff07fae3d6e12cca9fff2c62c872da7a43b194"
+    },
+    "command-creator": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "719f86df0a51d5a347df4bb829caede08ee6bd06f4b6b2e79e5e3a6cd35cc866"
+    },
+    "deep-research": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "14adeb9dcab23a2505be6db629326e1ba97d0f4812a6c85e831512bb355ab971"
+    },
+    "eureka": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "41c4653e8c48ac830995424e5305af98993a3ff81a17d5daa3f80f368cba9aed"
+    },
+    "github-fix-issue": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "20a737aea8d26452224fd69f9bdfe6cd5390b08353b3232745ec30d48416efcd"
+    },
+    "github-review-pr": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "dc42acfe05be1244587280d7bc1eb8dbe3cb3adfaf614a1f49aa700deea0f259"
+    },
+    "kiro-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "8122115eafa1da05d65e0c977b45d8ff407df59c065006f893de861d8ad43ebf"
+    },
+    "nanobanana-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "c6be6ae63059809abf6c5d0c1283fdc2a4b08d52702b021ed270cd5e4aa28099"
+    },
+    "reflection": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "d670a1e73032adbf1aa31f0a7e0986e0ba55a2de3ad11f3ab44f29f96c24bdea"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",
       "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
+    },
+    "skill-creator": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "5e60ea91b6486e50a51fbf11a8f9b18a3ab547cb6b5ee8f6cf6732e9ff3cb22a"
+    },
+    "spec-kit-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "3cfc36c7d55442522876735674204f9d36a9fe93e28bbf5c7c5e06f5b9739c9d"
+    },
+    "translate": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "91a463ee5429c7decbc4bb7f7faf76169e59e3e4d80ad77768fefeae8b2f60b3"
+    },
+    "youtube-transcribe-skill": {
+      "source": "feiskyer/claude-code-settings",
+      "sourceType": "github",
+      "computedHash": "15e69011892b378e51a5a9e6d067ee41b764d4f0067739ab2c16de58bbe13b64"
     }
   }
 }
