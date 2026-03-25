@@ -24,6 +24,11 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] shadcn/ui setup (Button, Card, Input components)
 - [x] Custom modes configured (7 modes: code-reviewer, docs-specialist, frontend-specialist, test-engineer, education, kilo-settings-assistant, session-learner)
 - [x] Subagents created: file-name-generator, topic-tagger, history-chat-learner
+- [x] Installed feiskyer/claude-code-settings (14 skills)
+- [x] Bound skills to custom modes
+- [x] Added full Radix UI dependencies (40+ packages)
+- [x] Fixed TypeScript errors in ai-elements (voice-selector, schema-display)
+- [x] Lint and build pass
 
 ## Current Structure
 
