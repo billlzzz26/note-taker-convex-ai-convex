@@ -66,7 +66,7 @@ The Note Taker app is complete and ready for deployment. Users need to:
 | Date | Changes |
 |------|---------|
 | Initial | Base Next.js template created |
-| Now | Complete Note Taker app with Convex, shadcn/ui, mobile-first rules, custom modes, and subagents |
+| Now | Complete Note Taker app with Convex, shadcn/ui, mobile-first rules, custom modes, subagents, ai-elements, and ESLint config |
 
 ## Pending Items
 
