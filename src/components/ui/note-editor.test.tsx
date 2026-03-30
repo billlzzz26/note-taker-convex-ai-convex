@@ -16,7 +16,7 @@ describe('NoteEditorDialog', () => {
       <NoteEditorDialog onSave={mockOnSave} isOpen={true} onOpenChange={mockOnOpenChange} />
     );
     
-    expect(screen.getByText('Create New Note')).toBeInTheDocument();
+    expect(screen.getByText('Create note')).toBeInTheDocument();
   });
 
   it('renders edit mode when note is provided', () => {
@@ -38,7 +38,7 @@ describe('NoteEditorDialog', () => {
       />
     );
     
-    expect(screen.getByText('Edit Note')).toBeInTheDocument();
+    expect(screen.getByText('Edit note')).toBeInTheDocument();
   });
 
   it('calls onSave with correct data when creating note', async () => {
@@ -46,8 +46,8 @@ describe('NoteEditorDialog', () => {
       <NoteEditorDialog onSave={mockOnSave} isOpen={true} onOpenChange={mockOnOpenChange} />
     );
 
-    const titleInput = screen.getByPlaceholderText('Note title...');
-    const contentTextarea = screen.getByPlaceholderText('Write your note...');
+    const titleInput = screen.getByPlaceholderText('Untitled note');
+    const contentTextarea = screen.getByPlaceholderText('Write in Markdown. Use the toolbar to format quickly.');
     
     fireEvent.change(titleInput, { target: { value: 'New Note Title' } });
     fireEvent.change(contentTextarea, { target: { value: 'New Note Content' } });
