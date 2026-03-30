@@ -106,9 +106,13 @@ def main():
 
         print(f"\nAll {len(servers)} server(s) ready")
 
-        # Run the command
-        print(f"Running: {' '.join(args.command)}\n")
-        result = subprocess.run(args.command, shell=False)
+        # Run the command — validate all args are strings before passing to subprocess
+        command = [str(arg) for arg in args.command if arg]
+        if not command or not command[0]:
+            print("Error: Invalid command", file=sys.stderr)
+            sys.exit(1)
+        print(f"Running: {' '.join(command)}\n")
+        result = subprocess.run(command, shell=False)
         sys.exit(result.returncode)
 
     finally:
