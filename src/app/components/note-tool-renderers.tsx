@@ -32,9 +32,25 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
     }
   };
 
-  const getResultMessage = (_toolName: string, result: unknown) => {
+  const getResultMessage = (toolName: string, result: unknown) => {
+    if (typeof result === "string") return result;
+
     const r = result as { message?: string; notes?: unknown[]; count?: number };
-    return r.message || "Operation completed";
+    if (r.message) return r.message;
+
+    const count =
+      typeof r.count === "number"
+        ? r.count
+        : Array.isArray(r.notes)
+          ? r.notes.length
+          : undefined;
+
+    if (typeof count === "number") {
+      return count === 1 ? "1 note found" : `${count} notes found`;
+    }
+
+    return toolName === "delete_note" ? "Note deleted" : "Operation completed";
+  };
   };
 
   return (
