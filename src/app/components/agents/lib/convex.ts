@@ -1,5 +1,3 @@
-import { CONVEX_URL } from "./env";
-
 export interface ConvexNote {
   _id: string;
   _creationTime: number;
@@ -32,12 +30,7 @@ export interface ToolCall {
 }
 
 async function convexFetch<T>(action: string, args: Record<string, unknown>): Promise<T> {
-  const url = CONVEX_URL;
-  if (!url) {
-    throw new Error("CONVEX_URL not configured");
-  }
-  
-  const response = await fetch(`${url}/api/${action}`, {
+  const response = await fetch("/api/convex", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action, args }),

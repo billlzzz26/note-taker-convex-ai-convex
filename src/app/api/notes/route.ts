@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CONVEX_URL } from "../../components/agents/lib/env";
 
+const NOTE_ACTION_ENDPOINTS = {
+  deleteNote: "/api/deleteNote",
+  getNotesByTag: "/api/getNotesByTag",
+  listNotes: "/api/listNotes",
+  saveNote: "/api/saveNote",
+  searchNotes: "/api/searchNotes",
+  updateNote: "/api/updateNote",
+} as const;
+
+type NoteAction = keyof typeof NOTE_ACTION_ENDPOINTS;
+
+function isNoteAction(value: unknown): value is NoteAction {
+  return typeof value === "string" && value in NOTE_ACTION_ENDPOINTS;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -10,7 +25,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "CONVEX_URL not configured" }, { status: 500 });
     }
 
-    const response = await fetch(`${CONVEX_URL}/api/${action}`, {
+    if (!isNoteAction(action)) {
+      return NextResponse.json({ error: "Unsupported note action" }, { status: 400 });
+    }
+
+    const targetUrl = new URL(NOTE_ACTION_ENDPOINTS[action], CONVEX_URL);
+
+    const response = await fetch(targetUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(args),
