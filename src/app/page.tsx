@@ -16,7 +16,6 @@ import { ThreadSidebar } from "./components/thread-sidebar";
 import { NotesPanel } from "./components/notes-panel";
 import { NoteToolRenderers } from "./components/note-tool-renderers";
 import { chat, type Message, type ToolCallResult } from "./components/agents/note-taker";
-import { CONVEX_URL } from "./components/agents/lib/env";
 
 interface Thread {
   id: string;
@@ -45,9 +44,8 @@ export default function Home() {
   }, []);
 
   const fetchNotes = async () => {
-    if (!CONVEX_URL) return;
     try {
-      const response = await fetch(`${CONVEX_URL}/api/listNotes`, {
+      const response = await fetch("/api/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "listNotes", args: {} }),
@@ -117,7 +115,7 @@ export default function Home() {
         ...prev,
         {
           role: "assistant",
-          content: "Sorry, I encountered an error. Please check that the Convex URL is configured in your environment.",
+          content: "Sorry, I encountered an error. Please check the server-side note API configuration.",
         },
       ]);
     } finally {

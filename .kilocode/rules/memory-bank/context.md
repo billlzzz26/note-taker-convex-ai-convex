@@ -21,6 +21,8 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Kept AI Elements integration on the stable components only, avoiding the current Windows Turbopack `shiki/streamdown` junction panic path
 - [x] `.gitignore` now ignores local `.tmp-*` recovery folders and the temporary root artifacts were cleaned up
 - [x] `SPEC.md` updated to match the current product state, Markdown roadmap, token system, AI Elements usage, and current platform constraints
+- [x] SSRF-prone direct client fetches were replaced with the internal `/api/notes` route, and note actions are now allow-listed before building Convex request URLs
+- [x] `src/app/components/agents/lib/convex.ts` now calls the internal `/api/convex` proxy route instead of constructing outbound Convex URLs directly in the client helper
 - [x] Convex schema and backend functions (convex/notes.ts, convex/schema.ts)
 - [x] Three-panel layout: ThreadSidebar, Chat, NotesPanel
 - [x] Agent implementation with 6 CRUD tools (save_note, search_notes, list_notes, get_notes_by_tag, update_note, delete_note)
@@ -98,6 +100,8 @@ The current app is functional, but the next planned product phase is a Markdown 
 | 2026-03-31 | Refreshed `SPEC.md` so it matches the current UI, editor roadmap, sync direction, and known Windows build constraints |
 | 2026-03-30 | Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill |
 | 2026-03-30 | Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg) |
+| 2026-03-31 | Hardened note-fetching paths against SSRF findings by routing client note reads through `/api/notes` and validating supported Convex actions server-side |
+| 2026-03-31 | Added `/api/convex` as an allow-listed server-side proxy so the shared Convex helper no longer performs direct outbound URL composition |
 
 ## Pending Items
 
