@@ -102,7 +102,12 @@ function renderInlineMarkdown(input: string) {
   output = output.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
   output = output.replace(
     /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noreferrer">$1</a>'
+    (_match, label, url) => {
+      const safeUrl = String(url)
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+      return `<a href="${safeUrl}" target="_blank" rel="noreferrer">${label}</a>`;
+    }
   );
   return output;
 }
