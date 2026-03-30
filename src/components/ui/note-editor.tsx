@@ -1,15 +1,53 @@
 "use client";
 
 import * as React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Check, X, Search, Tag } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  Bold,
+  Check,
+  CheckCheck,
+  Code2,
+  Eye,
+  Heading1,
+  Heading2,
+  Heading3,
+  Italic,
+  Link2,
+  List,
+  ListChecks,
+  ListOrdered,
+  PanelRight,
+  PencilLine,
+  Plus,
+  Quote,
+  Search,
+  Split,
+  Table2,
+  Tag,
+  Trash2,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 
 export interface Note {
   _id: string;
@@ -28,23 +66,357 @@ interface NoteEditorProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+type EditorMode = "write" | "preview" | "split";
+type SyncState = "saved" | "draft";
+
 const AVAILABLE_TAGS = [
-  "Work", "Personal", "Project", "Meeting", 
-  "Idea", "Todo", "High", "Medium", "Low"
+  "Work",
+  "Personal",
+  "Project",
+  "Meeting",
+  "Idea",
+  "Todo",
+  "High",
+  "Medium",
+  "Low",
 ];
 
-export function NoteEditorDialog({ 
-  note, 
-  onSave, 
+const MARKDOWN_SHORTCUTS = [
+  { label: "Bold", hint: "Ctrl/Cmd + B" },
+  { label: "Italic", hint: "Ctrl/Cmd + I" },
+  { label: "Link", hint: "Ctrl/Cmd + K" },
+  { label: "Save", hint: "Ctrl/Cmd + S" },
+];
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function renderInlineMarkdown(input: string) {
+  let output = escapeHtml(input);
+  output = output.replace(/`([^`]+)`/g, "<code>$1</code>");
+  output = output.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  output = output.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
+  output = output.replace(
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    (_match, label, url) => {
+      const safeUrl = String(url)
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+      return `<a href="${safeUrl}" target="_blank" rel="noreferrer">${label}</a>`;
+    }
+  );
+  return output;
+}
+
+function renderMarkdownToHtml(markdown: string) {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const html: string[] = [];
+  let index = 0;
+  let inCodeBlock = false;
+  let codeFence = "";
+  let codeLines: string[] = [];
+
+  const flushParagraph = (paragraphLines: string[]) => {
+    if (!paragraphLines.length) return;
+    html.push(`<p>${renderInlineMarkdown(paragraphLines.join(" "))}</p>`);
+  };
+
+  while (index < lines.length) {
+    const rawLine = lines[index];
+    const line = rawLine.trimEnd();
+
+    if (inCodeBlock) {
+      if (line.startsWith("```")) {
+        const language = codeFence.trim();
+        html.push(
+          `<pre data-language="${escapeHtml(language)}"><code>${escapeHtml(
+            codeLines.join("\n")
+          )}</code></pre>`
+        );
+        inCodeBlock = false;
+        codeFence = "";
+        codeLines = [];
+      } else {
+        codeLines.push(rawLine);
+      }
+      index += 1;
+      continue;
+    }
+
+    if (line.startsWith("```")) {
+      inCodeBlock = true;
+      codeFence = line.slice(3);
+      index += 1;
+      continue;
+    }
+
+    if (!line.trim()) {
+      html.push("");
+      index += 1;
+      continue;
+    }
+
+    if (/^#{1,3}\s/.test(line)) {
+      const level = Math.min(line.match(/^#+/)?.[0].length ?? 1, 3);
+      const content = line.replace(/^#{1,3}\s+/, "");
+      html.push(`<h${level}>${renderInlineMarkdown(content)}</h${level}>`);
+      index += 1;
+      continue;
+    }
+
+    if (/^---+$/.test(line) || /^\*\*\*+$/.test(line)) {
+      html.push("<hr />");
+      index += 1;
+      continue;
+    }
+
+    if (/^>\s?/.test(line)) {
+      const quoteLines: string[] = [];
+      while (index < lines.length && /^>\s?/.test(lines[index].trim())) {
+        quoteLines.push(lines[index].trim().replace(/^>\s?/, ""));
+        index += 1;
+      }
+      html.push(`<blockquote>${quoteLines.map(renderInlineMarkdown).join("<br />")}</blockquote>`);
+      continue;
+    }
+
+    if (/^- \[[ xX]\]\s+/.test(line)) {
+      const items: string[] = [];
+      while (index < lines.length && /^- \[[ xX]\]\s+/.test(lines[index].trim())) {
+        const taskLine = lines[index].trim();
+        const checked = /^- \[[xX]\]\s+/.test(taskLine);
+        const content = taskLine.replace(/^- \[[ xX]\]\s+/, "");
+        items.push(
+          `<li data-task="true"><input type="checkbox" ${
+            checked ? "checked" : ""
+          } disabled /><span>${renderInlineMarkdown(content)}</span></li>`
+        );
+        index += 1;
+      }
+      html.push(`<ul class="task-list">${items.join("")}</ul>`);
+      continue;
+    }
+
+    if (/^- /.test(line)) {
+      const items: string[] = [];
+      while (index < lines.length && /^- /.test(lines[index].trim())) {
+        items.push(
+          `<li>${renderInlineMarkdown(lines[index].trim().replace(/^- /, ""))}</li>`
+        );
+        index += 1;
+      }
+      html.push(`<ul>${items.join("")}</ul>`);
+      continue;
+    }
+
+    if (/^\d+\.\s/.test(line)) {
+      const items: string[] = [];
+      while (index < lines.length && /^\d+\.\s/.test(lines[index].trim())) {
+        items.push(
+          `<li>${renderInlineMarkdown(
+            lines[index].trim().replace(/^\d+\.\s/, "")
+          )}</li>`
+        );
+        index += 1;
+      }
+      html.push(`<ol>${items.join("")}</ol>`);
+      continue;
+    }
+
+    if (
+      line.includes("|") &&
+      index + 1 < lines.length &&
+      /^\s*\|?[-: ]+\|[-|: ]+\s*$/.test(lines[index + 1])
+    ) {
+      const headerCells = line
+        .split("|")
+        .map((cell) => cell.trim())
+        .filter(Boolean);
+      index += 2;
+      const bodyRows: string[] = [];
+      while (index < lines.length && lines[index].includes("|")) {
+        const row = lines[index]
+          .split("|")
+          .map((cell) => cell.trim())
+          .filter(Boolean);
+        bodyRows.push(
+          `<tr>${row.map((cell) => `<td>${renderInlineMarkdown(cell)}</td>`).join("")}</tr>`
+        );
+        index += 1;
+      }
+      html.push(
+        `<div class="table-wrap"><table><thead><tr>${headerCells
+          .map((cell) => `<th>${renderInlineMarkdown(cell)}</th>`)
+          .join("")}</tr></thead><tbody>${bodyRows.join("")}</tbody></table></div>`
+      );
+      continue;
+    }
+
+    const paragraphLines: string[] = [];
+    while (
+      index < lines.length &&
+      lines[index].trim() &&
+      !lines[index].trim().startsWith("```") &&
+      !/^#{1,3}\s/.test(lines[index].trim()) &&
+      !/^>\s?/.test(lines[index].trim()) &&
+      !/^- /.test(lines[index].trim()) &&
+      !/^\d+\.\s/.test(lines[index].trim()) &&
+      !/^---+$/.test(lines[index].trim()) &&
+      !/^\*\*\*+$/.test(lines[index].trim())
+    ) {
+      paragraphLines.push(lines[index].trim());
+      index += 1;
+    }
+    flushParagraph(paragraphLines);
+  }
+
+  return html.filter(Boolean).join("\n");
+}
+
+function getSelectionRange(
+  textarea: HTMLTextAreaElement | null,
+  value: string
+) {
+  if (!textarea) {
+    return { start: value.length, end: value.length, selected: "" };
+  }
+
+  const start = textarea.selectionStart ?? 0;
+  const end = textarea.selectionEnd ?? 0;
+  return { start, end, selected: value.slice(start, end) };
+}
+
+function stripMarkdown(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " code block ")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/^>\s?/gm, "")
+    .replace(/^- \[[ xX]\]\s+/gm, "")
+    .replace(/^- /gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/\|/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function createNoteSnippet(markdown: string) {
+  const plain = stripMarkdown(markdown);
+  if (plain.length <= 160) return plain || "No content yet";
+  return `${plain.slice(0, 157).trim()}...`;
+}
+
+function detectNoteFeatures(markdown: string) {
+  return {
+    hasCode: /```/.test(markdown),
+    hasTable: /\|/.test(markdown) && /\n.*\|.*\n/.test(markdown),
+    hasTasks: /- \[[ xX]\]/.test(markdown),
+  };
+}
+
+function formatDate(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+  });
+}
+
+function SyncStatusChip({ state }: { state: SyncState }) {
+  const config =
+    state === "draft"
+      ? {
+          icon: PencilLine,
+          label: "Unsaved draft",
+          className:
+            "border-[color:var(--aurora-yellow)]/35 bg-[color:var(--aurora-yellow)]/10 text-[color:var(--aurora-yellow)]",
+        }
+      : {
+          icon: CheckCheck,
+          label: "Saved",
+          className:
+            "border-[color:var(--aurora-lime)]/30 bg-[color:var(--aurora-lime)]/10 text-[color:var(--aurora-lime)]",
+        };
+
+  const Icon = config.icon;
+
+  return (
+    <div
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-medium tracking-[0.08em] uppercase",
+        config.className
+      )}
+    >
+      <Icon className="size-3.5" />
+      <span>{config.label}</span>
+    </div>
+  );
+}
+
+function ToolbarButton({
+  label,
+  icon: Icon,
+  onClick,
+}: {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+}) {
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="border border-transparent text-[color:var(--warm-grey-light)] hover:border-[color:var(--glass-border)] hover:bg-[color:var(--glass)] hover:text-[color:var(--accent-teal)]"
+    >
+      <Icon className="size-4" />
+    </Button>
+  );
+}
+
+function MarkdownPreview({ content }: { content: string }) {
+  const html = React.useMemo(() => renderMarkdownToHtml(content), [content]);
+
+  return (
+    <div
+      className="markdown-preview min-h-[24rem] rounded-2xl border border-[color:var(--glass-border)] bg-[color:var(--black-primary)]/80 p-5"
+      // SAFETY: HTML is generated by renderMarkdownToHtml which escapes all user
+      // text via escapeHtml(). Links are restricted to https?:// protocols only.
+      dangerouslySetInnerHTML={{
+        __html:
+          html ||
+          "<p class='empty'>Preview your Markdown here as you write.</p>",
+      }}
+    />
+  );
+}
+
+export function NoteEditorDialog({
+  note,
+  onSave,
   onDelete,
-  isOpen = true,
-  onOpenChange 
+  isOpen,
+  onOpenChange,
 }: NoteEditorProps) {
   const [title, setTitle] = React.useState(note?.title || "");
   const [content, setContent] = React.useState(note?.content || "");
   const [tags, setTags] = React.useState<string[]>(note?.tags || []);
   const [newTag, setNewTag] = React.useState("");
   const [showTagInput, setShowTagInput] = React.useState(false);
+  const [editorMode, setEditorMode] = React.useState<EditorMode>("split");
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   React.useEffect(() => {
     if (note) {
@@ -56,7 +428,67 @@ export function NoteEditorDialog({
       setContent("");
       setTags([]);
     }
+    setEditorMode("split");
+    setShowTagInput(false);
+    setNewTag("");
   }, [note, isOpen]);
+
+  const isEditing = !!note;
+  const hasChanges =
+    title !== (note?.title || "") ||
+    content !== (note?.content || "") ||
+    JSON.stringify(tags) !== JSON.stringify(note?.tags || []);
+  const syncState: SyncState = hasChanges ? "draft" : "saved";
+  const noteFeatures = React.useMemo(() => detectNoteFeatures(content), [content]);
+
+  const applyToSelection = React.useCallback(
+    (prefix: string, suffix = prefix, placeholder = "text") => {
+      const textarea = textareaRef.current;
+      const { start, end, selected } = getSelectionRange(textarea, content);
+      const value = selected || placeholder;
+      const nextContent =
+        content.slice(0, start) + prefix + value + suffix + content.slice(end);
+      setContent(nextContent);
+
+      requestAnimationFrame(() => {
+        textarea?.focus();
+        if (!textarea) return;
+        const selectionStart = start + prefix.length;
+        const selectionEnd = selectionStart + value.length;
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+      });
+    },
+    [content]
+  );
+
+  const applyLinePrefix = React.useCallback(
+    (prefix: string) => {
+      const textarea = textareaRef.current;
+      const { start, end } = getSelectionRange(textarea, content);
+      const blockStart = content.lastIndexOf("\n", start - 1) + 1;
+      const blockEnd = content.indexOf("\n", end);
+      const safeBlockEnd = blockEnd === -1 ? content.length : blockEnd;
+      const block = content.slice(blockStart, safeBlockEnd);
+      const nextBlock = block
+        .split("\n")
+        .map((line) => `${prefix}${line}`)
+        .join("\n");
+      const nextContent =
+        content.slice(0, blockStart) + nextBlock + content.slice(safeBlockEnd);
+      setContent(nextContent);
+      requestAnimationFrame(() => textarea?.focus());
+    },
+    [content]
+  );
+
+  const insertTable = React.useCallback(() => {
+    const table = "\n| Column | Column |\n| --- | --- |\n| Value | Value |\n";
+    const textarea = textareaRef.current;
+    const { start, end } = getSelectionRange(textarea, content);
+    const nextContent = content.slice(0, start) + table + content.slice(end);
+    setContent(nextContent);
+    requestAnimationFrame(() => textarea?.focus());
+  }, [content]);
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -65,7 +497,7 @@ export function NoteEditorDialog({
       title: title.trim(),
       content: content.trim(),
       tags,
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     });
   };
 
@@ -79,10 +511,15 @@ export function NoteEditorDialog({
   };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter(t => t !== tagToRemove));
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  const isEditing = !!note;
+  const metadataItems = [
+    { label: "Last edited", value: note ? formatDate(note.updatedAt) : "Not saved yet" },
+    { label: "Words", value: String(stripMarkdown(content).split(/\s+/).filter(Boolean).length) },
+    { label: "Characters", value: String(content.length) },
+    { label: "Markdown", value: "GitHub-first" },
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -92,116 +529,362 @@ export function NoteEditorDialog({
           New Note
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Note" : "Create New Note"}</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Title</label>
-            <Input 
-              placeholder="Note title..." 
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              autoFocus
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Content</label>
-            <Textarea 
-              placeholder="Write your note..." 
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[150px] resize-none"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Tags</label>
-            <div className="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-                  {tag}
-                  <button 
-                    onClick={() => removeTag(tag)}
-                    className="ml-1 hover:text-destructive"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-              
-              {showTagInput ? (
-                <div className="flex gap-1">
-                  <Input 
-                    placeholder="Add tag..." 
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        addTag(newTag);
-                      }
-                      if (e.key === "Escape") {
-                        setShowTagInput(false);
-                        setNewTag("");
-                      }
-                    }}
-                    className="h-7 w-24 text-sm"
+      <DialogContent
+        showCloseButton
+        className="max-w-[min(96vw,1200px)] gap-0 overflow-hidden border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] p-0 text-[color:var(--platinum)] shadow-2xl shadow-black/40"
+      >
+        <DialogHeader className="border-b border-[color:var(--glass-border)] bg-[color:var(--black-primary)] px-5 py-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 flex-1 space-y-3">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                <span className="rounded-full border border-[color:var(--glass-border)] bg-[color:var(--glass)] px-2 py-1">
+                  Markdown Workspace
+                </span>
+                {isEditing ? <span>Edit note</span> : <span>Create note</span>}
+              </div>
+              <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
+                <div className="min-w-0 flex-1">
+                  <label htmlFor="note-title" className="sr-only">
+                    Note title
+                  </label>
+                  <Input
+                    id="note-title"
+                    placeholder="Untitled note"
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
                     autoFocus
+                    className="h-12 border-none bg-transparent px-0 text-2xl font-semibold tracking-[-0.02em] text-[color:var(--platinum)] placeholder:text-[color:var(--warm-grey)] focus-visible:ring-0"
                   />
-                  <Button 
-                    variant="ghost" 
-                    size="icon-sm"
-                    onClick={() => addTag(newTag)}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <SyncStatusChip state={syncState} />
+                  <div className="inline-flex items-center gap-1 rounded-full border border-[color:var(--glass-border)] bg-[color:var(--glass)] px-3 py-1 text-xs text-[color:var(--warm-grey-light)]">
+                    <Eye className="size-3.5 text-[color:var(--accent-teal)]" />
+                    Auto-save planned
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogHeader>
+        <div className="grid min-h-[72vh] grid-cols-1 xl:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="flex min-w-0 flex-col">
+            <div className="border-b border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] px-4 py-3">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="inline-flex items-center gap-1 rounded-xl border border-[color:var(--glass-border)] bg-[color:var(--glass)] p-1">
+                    <ToolbarButton label="Heading 1" icon={Heading1} onClick={() => applyLinePrefix("# ")} />
+                    <ToolbarButton label="Heading 2" icon={Heading2} onClick={() => applyLinePrefix("## ")} />
+                    <ToolbarButton label="Heading 3" icon={Heading3} onClick={() => applyLinePrefix("### ")} />
+                    <ToolbarButton label="Quote" icon={Quote} onClick={() => applyLinePrefix("> ")} />
+                    <ToolbarButton
+                      label="Code block"
+                      icon={Code2}
+                      onClick={() => applyToSelection("\n```ts\n", "\n```\n", "const note = true;")}
+                    />
+                  </div>
+
+                  <div className="inline-flex items-center gap-1 rounded-xl border border-[color:var(--glass-border)] bg-[color:var(--glass)] p-1">
+                    <ToolbarButton label="Bold" icon={Bold} onClick={() => applyToSelection("**", "**", "strong")} />
+                    <ToolbarButton label="Italic" icon={Italic} onClick={() => applyToSelection("*", "*", "emphasis")} />
+                    <ToolbarButton
+                      label="Link"
+                      icon={Link2}
+                      onClick={() => applyToSelection("[", "](https://example.com)", "label")}
+                    />
+                    <ToolbarButton label="Bullet list" icon={List} onClick={() => applyLinePrefix("- ")} />
+                    <ToolbarButton label="Ordered list" icon={ListOrdered} onClick={() => applyLinePrefix("1. ")} />
+                    <ToolbarButton label="Task list" icon={ListChecks} onClick={() => applyLinePrefix("- [ ] ")} />
+                    <ToolbarButton label="Table" icon={Table2} onClick={insertTable} />
+                  </div>
+                </div>
+
+                <div className="inline-flex w-full items-center gap-1 rounded-xl border border-[color:var(--glass-border)] bg-[color:var(--glass)] p-1 lg:w-auto">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditorMode("write")}
+                    className={cn(
+                      "flex-1 text-[color:var(--warm-grey-light)] hover:text-[color:var(--platinum)] lg:flex-none",
+                      editorMode === "write" &&
+                        "border border-[color:var(--glass-border)] bg-[color:var(--black-tertiary)] text-[color:var(--accent-teal)]"
+                    )}
                   >
-                    <Check className="w-3 h-3" />
+                    <PencilLine className="size-4" />
+                    Write
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditorMode("preview")}
+                    className={cn(
+                      "flex-1 text-[color:var(--warm-grey-light)] hover:text-[color:var(--platinum)] lg:flex-none",
+                      editorMode === "preview" &&
+                        "border border-[color:var(--glass-border)] bg-[color:var(--black-tertiary)] text-[color:var(--accent-teal)]"
+                    )}
+                  >
+                    <Eye className="size-4" />
+                    Preview
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditorMode("split")}
+                    className={cn(
+                      "flex-1 text-[color:var(--warm-grey-light)] hover:text-[color:var(--platinum)] lg:flex-none",
+                      editorMode === "split" &&
+                        "border border-[color:var(--glass-border)] bg-[color:var(--black-tertiary)] text-[color:var(--accent-teal)]"
+                    )}
+                  >
+                    <Split className="size-4" />
+                    Split
                   </Button>
                 </div>
-              ) : (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowTagInput(true)}
-                  className="h-7"
-                >
-                  <Plus className="w-3 h-3 mr-1" />
-                  Add
-                </Button>
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                "grid min-h-0 flex-1 gap-0",
+                editorMode === "split" ? "lg:grid-cols-2" : "grid-cols-1"
+              )}
+            >
+              {editorMode !== "preview" && (
+                <div className="min-w-0 border-b border-[color:var(--glass-border)] p-4 lg:border-r lg:border-b-0">
+                  <label htmlFor="note-content" className="sr-only">
+                    Markdown content
+                  </label>
+                  <Textarea
+                    id="note-content"
+                    ref={textareaRef}
+                    placeholder="Write in Markdown. Use the toolbar to format quickly."
+                    value={content}
+                    onChange={(event) => setContent(event.target.value)}
+                    className="min-h-[26rem] resize-none border-[color:var(--glass-border)] bg-[color:var(--black-primary)]/80 px-5 py-4 font-[450] leading-7 text-[color:var(--platinum)] placeholder:text-[color:var(--warm-grey)] focus-visible:border-[color:var(--accent-teal-dim)] focus-visible:ring-[color:var(--accent-teal-dim)]/30"
+                  />
+                </div>
+              )}
+
+              {editorMode !== "write" && (
+                <div className="min-w-0 p-4">
+                  <MarkdownPreview content={content} />
+                </div>
               )}
             </div>
-            
-            <div className="flex flex-wrap gap-1 mt-2">
-              {AVAILABLE_TAGS.filter(t => !tags.includes(t)).map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => addTag(tag)}
-                  className="text-xs px-2 py-1 rounded bg-muted hover:bg-muted/80 text-muted-foreground"
-                >
-                  + {tag}
-                </button>
-              ))}
+
+            <div className="border-t border-[color:var(--glass-border)] bg-[color:var(--black-primary)]/80 px-4 py-3 text-xs text-[color:var(--warm-grey)]">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  {MARKDOWN_SHORTCUTS.map((shortcut) => (
+                    <span
+                      key={shortcut.label}
+                      className="rounded-full border border-[color:var(--glass-border)] bg-[color:var(--glass)] px-2.5 py-1"
+                    >
+                      {shortcut.label}: {shortcut.hint}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span>{stripMarkdown(content).split(/\s+/).filter(Boolean).length} words</span>
+                  <span aria-hidden="true">•</span>
+                  <span>{content.length} characters</span>
+                </div>
+              </div>
             </div>
           </div>
+
+          <aside className="border-t border-[color:var(--glass-border)] bg-[color:var(--black-primary)]/90 xl:border-t-0 xl:border-l">
+            <div className="flex items-center justify-between border-b border-[color:var(--glass-border)] px-4 py-3">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                  Note Metadata
+                </p>
+                <p className="mt-1 text-sm text-[color:var(--warm-grey-light)]">
+                  Keep structure and sync context visible while writing.
+                </p>
+              </div>
+              <PanelRight className="size-4 text-[color:var(--accent-teal)]" />
+            </div>
+            <ScrollArea className="h-[320px] xl:h-[calc(72vh-4.5rem)]">
+              <div className="space-y-5 p-4">
+                <section className="space-y-2">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                    Tags
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="gap-1 border border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--platinum)]"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          aria-label={`Remove ${tag} tag`}
+                          onClick={() => removeTag(tag)}
+                          className="text-[color:var(--warm-grey-light)] transition-colors hover:text-[color:var(--aurora-red)]"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                    {showTagInput ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          placeholder="Add tag..."
+                          value={newTag}
+                          onChange={(event) => setNewTag(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addTag(newTag);
+                            }
+                            if (event.key === "Escape") {
+                              setShowTagInput(false);
+                              setNewTag("");
+                            }
+                          }}
+                          className="h-8 w-28 border-[color:var(--glass-border)] bg-[color:var(--black-tertiary)] text-[color:var(--platinum)]"
+                          autoFocus
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => addTag(newTag)}
+                          className="text-[color:var(--accent-teal)] hover:bg-[color:var(--glass)]"
+                        >
+                          <Check className="size-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowTagInput(true)}
+                        className="border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--warm-grey-light)] hover:bg-[color:var(--black-tertiary)] hover:text-[color:var(--platinum)]"
+                      >
+                        <Plus className="size-3.5" />
+                        Add tag
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {AVAILABLE_TAGS.filter((tag) => !tags.includes(tag)).map((tag) => (
+                      <button
+                        type="button"
+                        key={tag}
+                        onClick={() => addTag(tag)}
+                        className="rounded-full border border-[color:var(--glass-border)] px-2 py-1 text-[11px] text-[color:var(--warm-grey-light)] transition-colors hover:border-[color:var(--accent-teal-dim)] hover:text-[color:var(--accent-teal)]"
+                      >
+                        + {tag}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-2">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                    Document Insights
+                  </p>
+                  <div className="grid gap-2">
+                    {metadataItems.map((item) => (
+                      <div
+                        key={item.label}
+                        className="rounded-2xl border border-[color:var(--glass-border)] bg-[color:var(--glass)] px-3 py-2"
+                      >
+                        <p className="text-[10px] uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                          {item.label}
+                        </p>
+                        <p className="mt-1 text-sm text-[color:var(--platinum)]">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-2">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-[color:var(--warm-grey)]">
+                    Document Signals
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "border border-[color:var(--glass-border)] bg-[color:var(--glass)]",
+                        noteFeatures.hasCode
+                          ? "text-[color:var(--accent-teal)]"
+                          : "text-[color:var(--warm-grey)]"
+                      )}
+                    >
+                      Code
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "border border-[color:var(--glass-border)] bg-[color:var(--glass)]",
+                        noteFeatures.hasTable
+                          ? "text-[color:var(--aurora-purple)]"
+                          : "text-[color:var(--warm-grey)]"
+                      )}
+                    >
+                      Table
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        "border border-[color:var(--glass-border)] bg-[color:var(--glass)]",
+                        noteFeatures.hasTasks
+                          ? "text-[color:var(--aurora-yellow)]"
+                          : "text-[color:var(--warm-grey)]"
+                      )}
+                    >
+                      Tasks
+                    </Badge>
+                  </div>
+                </section>
+
+                <section className="rounded-2xl border border-[color:var(--glass-border)] bg-[color:var(--glass)] p-3">
+                  <div className="flex items-start gap-2">
+                    <TriangleAlert className="mt-0.5 size-4 text-[color:var(--accent-teal)]" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-[color:var(--platinum)]">
+                        Sync roadmap
+                      </p>
+                      <p className="text-xs leading-5 text-[color:var(--warm-grey-light)]">
+                        This UI is ready for autosave, local draft recovery, and conflict-safe sync states in the next phase.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </ScrollArea>
+          </aside>
         </div>
-        
-        <DialogFooter className="gap-2">
+
+        <DialogFooter className="gap-2 border-t border-[color:var(--glass-border)] bg-[color:var(--black-primary)]/95">
           {isEditing && onDelete && (
-            <Button 
-              variant="destructive" 
-              onClick={() => onDelete(note._id)}
-              className="mr-auto"
-            >
+            <Button variant="destructive" onClick={() => onDelete(note._id)} className="mr-auto">
               <Trash2 className="w-4 h-4 mr-1" />
               Delete
             </Button>
           )}
-          <Button variant="outline" onClick={() => onOpenChange?.(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange?.(false)}
+            className="border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--warm-grey-light)] hover:bg-[color:var(--black-tertiary)] hover:text-[color:var(--platinum)]"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!title.trim()}>
+          <Button
+            onClick={handleSave}
+            disabled={!title.trim()}
+            className="bg-[color:var(--accent-teal)] text-[color:var(--black-primary)] hover:bg-[color:var(--accent-teal-dim)]"
+          >
             <Check className="w-4 h-4 mr-1" />
             {isEditing ? "Save" : "Create"}
           </Button>
@@ -223,49 +906,44 @@ export function NotesList({ notes, onEdit, onDelete }: NotesListProps) {
 
   const allTags = React.useMemo(() => {
     const tags = new Set<string>();
-    notes.forEach(n => n.tags.forEach(t => tags.add(t)));
+    notes.forEach((note) => note.tags.forEach((tag) => tags.add(tag)));
     return Array.from(tags).sort();
   }, [notes]);
 
   const filteredNotes = React.useMemo(() => {
-    return notes.filter(note => {
-      const matchesSearch = !searchQuery || 
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase());
-      
+    return notes.filter((note) => {
+      const normalizedQuery = searchQuery.toLowerCase();
+      const snippet = stripMarkdown(note.content).toLowerCase();
+      const matchesSearch =
+        !normalizedQuery ||
+        note.title.toLowerCase().includes(normalizedQuery) ||
+        snippet.includes(normalizedQuery);
+
       const matchesTag = filterTag === "all" || note.tags.includes(filterTag);
-      
       return matchesSearch && matchesTag;
     });
   }, [notes, searchQuery, filterTag]);
 
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString("en-US", { 
-      month: "short", 
-      day: "numeric",
-      year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined
-    });
-  };
-
   const tagColors: Record<string, string> = {
-    High: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    Medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-    Low: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    Work: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    Personal: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    Project: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-    Meeting: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200",
-    Idea: "bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200",
-    Todo: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+    High: "text-[color:var(--aurora-red)]",
+    Medium: "text-[color:var(--aurora-yellow)]",
+    Low: "text-[color:var(--aurora-lime)]",
+    Work: "text-[color:var(--accent-teal)]",
+    Personal: "text-[color:var(--warm-grey-light)]",
+    Project: "text-[color:var(--aurora-purple)]",
+    Meeting: "text-[color:var(--accent-teal-dim)]",
+    Idea: "text-[color:var(--platinum)]",
+    Todo: "text-[color:var(--aurora-yellow)]",
   };
 
   if (notes.length === 0) {
     return (
-      <Card>
+      <Card className="border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] text-[color:var(--platinum)]">
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <p className="text-muted-foreground text-sm">No notes yet</p>
-          <p className="text-muted-foreground text-xs mt-1">Create your first note to get started</p>
+          <p className="text-sm text-[color:var(--platinum)]">No notes yet</p>
+          <p className="mt-1 text-xs text-[color:var(--warm-grey)]">
+            Create your first note to get started
+          </p>
         </CardContent>
       </Card>
     );
@@ -275,23 +953,25 @@ export function NotesList({ notes, onEdit, onDelete }: NotesListProps) {
     <div className="space-y-4">
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search notes..." 
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[color:var(--warm-grey)]" />
+          <Input
+            placeholder="Search notes..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] pl-9 text-[color:var(--platinum)] placeholder:text-[color:var(--warm-grey)]"
           />
         </div>
         <Select value={filterTag} onValueChange={setFilterTag}>
-          <SelectTrigger className="w-[140px]">
-            <Tag className="w-4 h-4 mr-2" />
+          <SelectTrigger className="w-[150px] border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] text-[color:var(--platinum)]">
+            <Tag className="mr-2 size-4 text-[color:var(--accent-teal)]" />
             <SelectValue placeholder="Filter by tag" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] text-[color:var(--platinum)]">
             <SelectItem value="all">All Tags</SelectItem>
-            {allTags.map(tag => (
-              <SelectItem key={tag} value={tag}>{tag}</SelectItem>
+            {allTags.map((tag) => (
+              <SelectItem key={tag} value={tag}>
+                {tag}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -299,56 +979,80 @@ export function NotesList({ notes, onEdit, onDelete }: NotesListProps) {
 
       <ScrollArea className="h-[400px]">
         <div className="space-y-2">
-          {filteredNotes.map((note) => (
-            <Card 
-              key={note._id} 
-              className="cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => onEdit(note)}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="text-sm font-medium line-clamp-1">
-                    {note.title}
-                  </CardTitle>
-                  <Button 
-                    variant="ghost" 
-                    size="icon-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(note._id);
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {note.content}
-                </p>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {note.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className={`px-2 py-0.5 text-xs rounded-full ${
-                        tagColors[tag] || "bg-muted text-muted-foreground"
-                      }`}
+          {filteredNotes.map((note) => {
+            const features = detectNoteFeatures(note.content);
+            return (
+              <Card
+                key={note._id}
+                className="cursor-pointer border-[color:var(--glass-border)] bg-[color:var(--black-secondary)] text-[color:var(--platinum)] transition-colors hover:bg-[color:var(--glass)]"
+                onClick={() => onEdit(note)}
+              >
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <CardTitle className="truncate text-sm font-medium">
+                        {note.title}
+                      </CardTitle>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {features.hasCode && (
+                          <Badge variant="secondary" className="border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--accent-teal)]">
+                            Code
+                          </Badge>
+                        )}
+                        {features.hasTable && (
+                          <Badge variant="secondary" className="border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--aurora-purple)]">
+                            Table
+                          </Badge>
+                        )}
+                        {features.hasTasks && (
+                          <Badge variant="secondary" className="border-[color:var(--glass-border)] bg-[color:var(--glass)] text-[color:var(--aurora-yellow)]">
+                            Tasks
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(note._id);
+                      }}
+                      className="text-[color:var(--warm-grey-light)] hover:bg-[color:var(--glass)] hover:text-[color:var(--aurora-red)]"
                     >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {formatDate(note.updatedAt)}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="line-clamp-2 text-sm leading-6 text-[color:var(--warm-grey-light)]">
+                    {createNoteSnippet(note.content)}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {note.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className={cn(
+                          "rounded-full border border-[color:var(--glass-border)] bg-[color:var(--glass)] px-2 py-0.5 text-xs",
+                          tagColors[tag] || "text-[color:var(--warm-grey-light)]"
+                        )}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-[color:var(--warm-grey)]">
+                    {formatDate(note.updatedAt)}
+                  </p>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </ScrollArea>
-      
+
       {filteredNotes.length === 0 && (
-        <p className="text-center text-muted-foreground py-8">
+        <p className="py-8 text-center text-[color:var(--warm-grey)]">
           No notes match your search
         </p>
       )}

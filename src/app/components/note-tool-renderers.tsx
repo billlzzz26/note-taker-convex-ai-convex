@@ -1,5 +1,7 @@
 "use client";
 
+import React, { FC, ReactNode } from "react";
+
 interface ToolCall {
   toolName: string;
   args: Record<string, unknown>;
@@ -33,8 +35,23 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
   };
 
   const getResultMessage = (toolName: string, result: unknown) => {
+    if (typeof result === "string") return result;
+
     const r = result as { message?: string; notes?: unknown[]; count?: number };
-    return r.message || "Operation completed";
+    if (r.message) return r.message;
+
+    const count =
+      typeof r.count === "number"
+        ? r.count
+        : Array.isArray(r.notes)
+          ? r.notes.length
+          : undefined;
+
+    if (typeof count === "number") {
+      return count === 1 ? "1 note found" : `${count} notes found`;
+    }
+
+    return toolName === "delete_note" ? "Note deleted" : "Operation completed";
   };
 
   return (
@@ -44,7 +61,7 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
           key={index}
           className="bg-neutral-800 rounded-lg p-3 flex items-start gap-3"
         >
-          <span className="text-lg">{getIcon(tc.toolName)}</span>
+          <span className="sm:text-lg">{getIcon(tc.toolName)}</span>
           <div className="flex-1">
             <p className="text-sm font-medium text-white">
               {tc.toolName.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -52,6 +69,29 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
             <p className="text-xs text-neutral-400 mt-1">
               {getResultMessage(tc.toolName, tc.result)}
             </p>
+            <details className="mt-3 rounded-xl border border-white/8 bg-black/30">
+              <summary className="cursor-pointer px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+                View payload
+              </summary>
+              <div className="space-y-3 border-t border-white/8 p-3">
+                <div>
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                    Arguments
+                  </p>
+                  <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
+                    <code>{JSON.stringify(tc.args, null, 2)}</code>
+                  </pre>
+                </div>
+                <div>
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                    Result
+                  </p>
+                  <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
+                    <code>{JSON.stringify(tc.result, null, 2)}</code>
+                  </pre>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
       ))}

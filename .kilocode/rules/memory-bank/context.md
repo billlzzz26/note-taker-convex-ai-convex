@@ -9,6 +9,18 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 ## Recently Completed
 
 - [x] SPEC.md with detailed specifications
+- [x] Root `TODO.md` created for Markdown Editor + Sync v1 execution tracking
+- [x] `EDITOR-DESIGN.md` created for Markdown editor UI direction using the `ui-ux-pro-max` skill
+- [x] `EDITOR-DESIGN.md` updated to use the shared black/teal/aurora token palette for editor UI states
+- [x] `src/components/ui/note-editor.tsx` upgraded into a Markdown workspace with write/preview/split modes, toolbar, metadata rail, and note feature badges
+- [x] `src/app/globals.css` updated with shared editor color tokens and markdown preview styling
+- [x] `src/components/ui/textarea.tsx` updated to forward refs for editor interactions
+- [x] `tsconfig.json` updated so production builds exclude Vitest files and setup code
+- [x] Local Bun-only dependency recovery unblocked Tailwind/PostCSS build resolution without changing repo package-manager policy
+- [x] `src/app/page.tsx` now uses AI Elements `Conversation` and `PromptInput` in the main chat UI
+- [x] Kept AI Elements integration on the stable components only, avoiding the current Windows Turbopack `shiki/streamdown` junction panic path
+- [x] `.gitignore` now ignores local `.tmp-*` recovery folders and the temporary root artifacts were cleaned up
+- [x] `SPEC.md` updated to match the current product state, Markdown roadmap, token system, AI Elements usage, and current platform constraints
 - [x] Convex schema and backend functions (convex/notes.ts, convex/schema.ts)
 - [x] Three-panel layout: ThreadSidebar, Chat, NotesPanel
 - [x] Agent implementation with 6 CRUD tools (save_note, search_notes, list_notes, get_notes_by_tag, update_note, delete_note)
@@ -29,6 +41,9 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Added full Radix UI dependencies (40+ packages)
 - [x] Fixed TypeScript errors in ai-elements (voice-selector, schema-display)
 - [x] Lint and build pass
+- [x] Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill
+- [x] Created test runner script and README for E2E tests
+- [x] Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
 
 ## Current Structure
 
@@ -61,10 +76,12 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 
 ## Current Focus
 
-The Note Taker app is complete and ready for deployment. Users need to:
-1. Set up Convex with `npx convex dev`
-2. Configure CONVEX_URL in Kilo dashboard
-3. Deploy the agent with `npm run deploy`
+The current app is functional, but the next planned product phase is a Markdown editor upgrade with safer sync semantics. Immediate focus areas are:
+
+1. Build GitHub-first Markdown editor support
+2. Keep Convex as the cloud source of truth with cloud-first sync
+3. Add autosave, local draft recovery, and conflict-safe version handling
+4. Preserve backward compatibility for existing notes during rollout
 
 ## Session History
 
@@ -72,9 +89,22 @@ The Note Taker app is complete and ready for deployment. Users need to:
 |------|---------|
 | Initial | Base Next.js template created |
 | Now | Complete Note Taker app with Convex, shadcn/ui, mobile-first rules, custom modes, subagents, ai-elements, and ESLint config |
+| 2026-03-30 | Added `TODO.md` checklist for Markdown Editor + Sync v1 implementation planning |
+| 2026-03-30 | Added `EDITOR-DESIGN.md` defining the UI system, layout, interactions, and states for the Markdown editor |
+| 2026-03-30 | Implemented the first Markdown editor UI pass with the new token palette and preview surface |
+| 2026-03-31 | Fixed local Tailwind/PostCSS build resolution under Bun and excluded Vitest files from production TypeScript builds |
+| 2026-03-31 | Integrated AI Elements into the main chat UI using `Conversation` and `PromptInput`, while avoiding the unstable `message.tsx` path on Windows |
+| 2026-03-31 | Added `.tmp-*` to `.gitignore` and removed temporary dependency-recovery folders from the project root |
+| 2026-03-31 | Refreshed `SPEC.md` so it matches the current UI, editor roadmap, sync direction, and known Windows build constraints |
+| 2026-03-30 | Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill |
+| 2026-03-30 | Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg) |
 
 ## Pending Items
 
+- [ ] Implement the UI architecture described in `EDITOR-DESIGN.md`
+- [ ] Execute the remaining `TODO.md` Phase 1 items for production-ready Markdown behavior
+- [ ] Extend Convex schema and note types for markdown sync metadata
+- [ ] Implement autosave, local drafts, and conflict-safe sync flow
 - [ ] Run `npx convex dev` to set up Convex backend
 - [ ] Deploy agent to Kilo platform
 - [ ] Configure CONVEX_URL in Kilo dashboard environment variables
