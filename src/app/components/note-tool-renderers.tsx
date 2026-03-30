@@ -1,5 +1,7 @@
 "use client";
 
+import React, { FC, ReactNode } from "react";
+
 interface ToolCall {
   toolName: string;
   args: Record<string, unknown>;
@@ -51,7 +53,6 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
 
     return toolName === "delete_note" ? "Note deleted" : "Operation completed";
   };
-  };
 
   return (
     <div className="flex flex-col gap-2 my-2">
@@ -60,7 +61,7 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
           key={index}
           className="bg-neutral-800 rounded-lg p-3 flex items-start gap-3"
         >
-          <span className="text-lg">{getIcon(tc.toolName)}</span>
+          <span className="sm:text-lg">{getIcon(tc.toolName)}</span>
           <div className="flex-1">
             <p className="text-sm font-medium text-white">
               {tc.toolName.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}

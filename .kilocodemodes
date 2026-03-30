@@ -22,9 +22,7 @@ customModes:
     groups:
       - read
       - command
-      - edit:
-          fileRegex: "\\.(md|mdx|txt|rst|adoc)$|README$|CHANGELOG$"
-          description: Documentation files only
+      - edit
 
   - slug: frontend-specialist
     name: 🎨 Frontend Specialist
@@ -36,9 +34,7 @@ customModes:
     groups:
       - read
       - browser
-      - edit:
-          fileRegex: "\\.(tsx?|jsx?|css|scss|less)$"
-          description: Frontend files only
+      - edit
 
   - slug: test-engineer
     name: 🧪 Test Engineer
@@ -50,9 +46,7 @@ customModes:
     groups:
       - read
       - command
-      - edit:
-          fileRegex: "\\.(test|spec)\\.(js|ts|jsx|tsx)$"
-          description: Test files only
+      - edit
 
   - slug: education
     name: 📚 Education
@@ -123,9 +117,7 @@ customModes:
     groups:
       - read
       - browser
-      - edit:
-          fileRegex: "^(kilo\\.json|\\.kilocodemodes|custom_modes\\.yaml|\\.kilo/.*|\\.vscode/.*)$"
-          description: Kilo config and related files only
+      - edit
 
   - slug: session-learner
     name: 🧠 Session Learner
@@ -143,6 +135,4 @@ customModes:
       - deep-research
     groups:
       - read
-      - edit:
-          fileRegex: "^\\.kilocode/chat-history/.*\\.md$"
-          description: Chat history markdown files only
+      - edit

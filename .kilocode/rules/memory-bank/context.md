@@ -41,6 +41,9 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Added full Radix UI dependencies (40+ packages)
 - [x] Fixed TypeScript errors in ai-elements (voice-selector, schema-display)
 - [x] Lint and build pass
+- [x] Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill
+- [x] Created test runner script and README for E2E tests
+- [x] Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
 
 ## Current Structure
 
@@ -74,6 +77,7 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 ## Current Focus
 
 The current app is functional, but the next planned product phase is a Markdown editor upgrade with safer sync semantics. Immediate focus areas are:
+
 1. Build GitHub-first Markdown editor support
 2. Keep Convex as the cloud source of truth with cloud-first sync
 3. Add autosave, local draft recovery, and conflict-safe version handling
@@ -92,6 +96,8 @@ The current app is functional, but the next planned product phase is a Markdown 
 | 2026-03-31 | Integrated AI Elements into the main chat UI using `Conversation` and `PromptInput`, while avoiding the unstable `message.tsx` path on Windows |
 | 2026-03-31 | Added `.tmp-*` to `.gitignore` and removed temporary dependency-recovery folders from the project root |
 | 2026-03-31 | Refreshed `SPEC.md` so it matches the current UI, editor roadmap, sync direction, and known Windows build constraints |
+| 2026-03-30 | Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill |
+| 2026-03-30 | Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg) |
 
 ## Pending Items
 

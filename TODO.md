@@ -3,6 +3,7 @@
 This checklist turns the approved implementation plan into an execution tracker for the next development phase.
 
 V1 goals:
+
 - GitHub-first Markdown
 - Cloud-first sync
 - Obsidian-ready architecture
@@ -75,6 +76,10 @@ V1 goals:
 
 ## Testing checklist
 
+- [x] Add E2E tests for main page layout (three-panel, empty state, chat input, responsive)
+- [x] Add E2E tests for thread sidebar (create, select, responsive)
+- [x] Add E2E tests for notes panel (visibility, header, responsive)
+- [x] Add E2E tests for note tool renderers (rendering, styling, accessibility)
 - [ ] Add unit tests for core GFM rendering behavior.
 - [ ] Add component tests for source mode, preview mode, and split view.
 - [ ] Add tests for toolbar formatting actions.
@@ -91,6 +96,21 @@ V1 goals:
 - [ ] Confirm legacy notes default cleanly into the markdown format contract.
 - [ ] Confirm search still returns useful results for old and new notes.
 - [ ] Confirm old note previews degrade gracefully if they contain non-markdown plain text.
+
+## 2026-03-30 (Evening Session)
+
+- [x] Add E2E tests for main page layout (three-panel, empty state, chat input, responsive)
+- [x] Add E2E tests for thread sidebar (create, select, responsive)
+- [x] Add E2E tests for notes panel (visibility, header, responsive)
+- [x] Add E2E tests for note tool renderers (rendering, styling, accessibility)
+- [x] Create test runner script and README
+- [x] Fix responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
+
+## 2026-03-30 (Late Evening Session)
+
+- [x] Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill
+- [x] Created test runner script and README for E2E tests
+- [x] Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
 
 ## Release readiness checklist
 
