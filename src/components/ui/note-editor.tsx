@@ -405,7 +405,7 @@ export function NoteEditorDialog({
   note,
   onSave,
   onDelete,
-  isOpen = true,
+  isOpen,
   onOpenChange,
 }: NoteEditorProps) {
   const [title, setTitle] = React.useState(note?.title || "");
