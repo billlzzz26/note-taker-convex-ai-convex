@@ -32,7 +32,7 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
     }
   };
 
-  const getResultMessage = (toolName: string, result: unknown) => {
+  const getResultMessage = (_toolName: string, result: unknown) => {
     const r = result as { message?: string; notes?: unknown[]; count?: number };
     return r.message || "Operation completed";
   };
@@ -52,6 +52,29 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
             <p className="text-xs text-neutral-400 mt-1">
               {getResultMessage(tc.toolName, tc.result)}
             </p>
+            <details className="mt-3 rounded-xl border border-white/8 bg-black/30">
+              <summary className="cursor-pointer px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
+                View payload
+              </summary>
+              <div className="space-y-3 border-t border-white/8 p-3">
+                <div>
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                    Arguments
+                  </p>
+                  <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
+                    <code>{JSON.stringify(tc.args, null, 2)}</code>
+                  </pre>
+                </div>
+                <div>
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                    Result
+                  </p>
+                  <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
+                    <code>{JSON.stringify(tc.result, null, 2)}</code>
+                  </pre>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
       ))}

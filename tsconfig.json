@@ -37,6 +37,10 @@
   ],
   "exclude": [
     "node_modules",
-    "convex"
+    "convex",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "src/setup-test.ts",
+    "vitest.config.ts"
   ]
 }

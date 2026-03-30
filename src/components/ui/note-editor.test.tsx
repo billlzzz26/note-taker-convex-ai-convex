@@ -92,6 +92,22 @@ describe('NoteEditorDialog', () => {
       expect(screen.getByText('Work')).toBeInTheDocument();
     });
   });
+
+  it('can switch to preview mode and show rendered markdown copy', async () => {
+    render(
+      <NoteEditorDialog onSave={mockOnSave} isOpen={true} onOpenChange={mockOnOpenChange} />
+    );
+
+    const contentTextarea = screen.getByPlaceholderText('Write in Markdown. Use the toolbar to format quickly.');
+    fireEvent.change(contentTextarea, { target: { value: '# Heading\n\n**Bold** text' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /preview/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Heading')).toBeInTheDocument();
+      expect(screen.getByText('Bold')).toBeInTheDocument();
+    });
+  });
 });
 
 describe('NotesList', () => {
@@ -132,6 +148,24 @@ describe('NotesList', () => {
     
     expect(screen.getByText('First Note')).toBeInTheDocument();
     expect(screen.getByText('Second Note')).toBeInTheDocument();
+  });
+
+  it('shows feature badges for markdown-heavy notes', () => {
+    const markdownNotes: Note[] = [
+      {
+        _id: '3',
+        title: 'Advanced Note',
+        content: '```ts\nconst a = 1;\n```\n\n- [ ] Task',
+        tags: ['Work'],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }
+    ];
+
+    render(<NotesList notes={markdownNotes} onEdit={mockOnEdit} onDelete={mockOnDelete} />);
+
+    expect(screen.getByText('Code')).toBeInTheDocument();
+    expect(screen.getByText('Tasks')).toBeInTheDocument();
   });
 
   it('filters notes by search query', () => {

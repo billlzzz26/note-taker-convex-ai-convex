@@ -3,122 +3,178 @@
 ## Project Overview
 
 - **Project Name**: Note Taker
-- **Type**: AI-powered notebook application with real-time sync
-- **Core Functionality**: An AI assistant that helps users create, search, update, and delete notes with persistent storage via Convex and real-time synchronization
-- **Target Users**: Anyone who wants an AI-powered note-taking assistant that works across sessions
+- **Type**: AI-powered notebook application with persistent notes, real-time updates, and a Markdown-first editor roadmap
+- **Core Functionality**: Users can chat with an AI assistant to create, search, update, and delete notes, while browsing and editing notes in a richer document-oriented UI
+- **Primary Direction**: GitHub-first Markdown, cloud-first sync, Obsidian-ready architecture
+- **Target Users**: Users who want an AI-assisted note workspace for technical, personal, and structured knowledge capture
+
+## Product State
+
+### Implemented Now
+
+- Three-panel application layout
+- AI chat flow for note CRUD operations
+- Convex-backed note storage
+- Real-time notes panel updates
+- Markdown-oriented note editor UI with:
+  - write mode
+  - preview mode
+  - split mode
+  - formatting toolbar
+  - metadata rail
+  - document feature badges in the notes list
+- Main chat UI upgraded to use stable AI Elements primitives:
+  - `Conversation`
+  - `PromptInput`
+- Shared black/teal/aurora design token system in the app theme
+
+### Planned Next
+
+- Schema-level markdown metadata
+- autosave and local draft recovery
+- conflict-safe cloud sync
+- production-grade Markdown rendering pipeline
+- future Obsidian-style extensions such as wiki links and callouts
 
 ## UI/UX Specification
 
 ### Layout Structure
 
 **Three-Panel Layout**:
-- **Left Panel (Thread Sidebar)**: 14rem (w-56) - Navigation for conversation threads
-- **Center Panel (Chat)**: flex-1 - Main chat interface with AI
-- **Right Panel (Notes Panel)**: 20rem (w-80) - Real-time notes display with Convex subscriptions
+- **Left Panel**: thread navigation and conversation switching
+- **Center Panel**: AI chat and assistant interaction surface
+- **Right Panel**: notes browser with live note previews
 
-### Responsive Breakpoints
-- Desktop (≥1024px): Full three-panel layout
-- Tablet (768-1023px): Collapsible sidebar, two panels visible
-- Mobile (<768px): Single panel with tab navigation
+### Responsive Intent
 
-### Visual Design
+- Desktop: full three-panel workspace
+- Tablet: reduced side density with collapsible/supporting panels
+- Mobile: prioritize single primary panel and stacked workflows
 
-**Color Palette**:
-- Background Primary: `#0a0a0a` (near black)
-- Background Secondary: `#171717` (dark gray)
-- Background Tertiary: `#262626` (lighter gray)
-- Border: `#404040` (subtle gray)
-- Text Primary: `#fafafa` (off-white)
-- Text Secondary: `#a3a3a3` (muted gray)
-- Accent Primary: `#3b82f6` (blue-500)
-- Accent Hover: `#2563eb` (blue-600)
-- Success: `#22c55e` (green-500)
-- Warning: `#f59e0b` (amber-500)
-- Error: `#ef4444` (red-500)
+### Visual Design System
 
-**Typography**:
-- Font Family: System UI (San Francisco, -apple-system, BlinkMacSystemFont, Segoe UI)
-- Heading Large: 1.5rem (24px), font-semibold
-- Heading Medium: 1.125rem (18px), font-medium
-- Body: 0.875rem (14px), font-normal
-- Small: 0.75rem (12px), font-normal
+The UI now follows a shared dark technical palette.
 
-**Spacing System**:
-- Base unit: 4px
-- Common spacing: 8px, 12px, 16px, 24px, 32px
+**Core Tokens**:
+- `--black-primary: #050505`
+- `--black-secondary: #0a0a0a`
+- `--black-tertiary: #111111`
+- `--platinum: #fafafa`
+- `--warm-grey: #888888`
+- `--warm-grey-light: #aaaaaa`
+- `--accent-teal: #5eead4`
+- `--accent-teal-dim: #2dd4bf`
+- `--accent-teal-dark: #0d9488`
+- `--aurora-red: #ff4757`
+- `--aurora-yellow: #EBCB8B`
+- `--aurora-lime: #32ff00`
+- `--aurora-purple: #6B3FA0`
 
-**Visual Effects**:
-- Border radius: 8px (cards), 6px (buttons), 4px (inputs)
-- Box shadows: Subtle shadow for elevated elements
-- Transitions: 150ms ease for hover states
-- Scrollbar: Custom styled, thin, subtle
+**Design Language**:
+- dark, editorial, technical workspace
+- minimal glass layering instead of heavy shadows
+- teal used as the primary interaction accent
+- aurora colors reserved for status and semantic feedback
 
-### Components
+### Typography
 
-**Thread Sidebar**:
-- Thread list with active indicator
-- "New Chat" button at top
-- Thread items with title preview
-- Active thread highlighted
+- Primary UI font: current app sans stack
+- Editor and workspace styling should remain readable and dense
+- Large title styling for note titles
+- compact uppercase metadata labels for utility surfaces
 
-**Chat Panel**:
-- Message bubbles (user vs AI)
-- Tool call renderers showing note operations
-- Input area with send button
-- Typing indicator
-- Auto-scroll to bottom
+## Center Panel Specification
 
-**Notes Panel**:
-- Real-time updating note list
-- Note cards showing title, content preview, tags
-- Tag badges with color coding
-- Timestamp display
-- Note count header
+### Chat Experience
 
-**Tool Renderers** (Custom):
-- save_note: Shows "Note saved" with title
-- search_notes: Shows search results count
-- list_notes: Shows all notes count
-- get_notes_by_tag: Shows tagged notes
-- update_note: Shows "Note updated"
-- delete_note: Shows "Note deleted"
+The center panel is the AI collaboration surface.
 
-## Functionality Specification
+Current behavior:
+- conversation list on the left
+- chat history in the center
+- prompt composer at the bottom
+- tool results rendered inline below assistant responses
 
-### Core Features
+Current implementation direction:
+- use AI Elements where stable and useful
+- avoid unstable AI Elements paths that currently trigger Windows Turbopack issues
 
-**1. Note CRUD Operations**:
-- Create notes with title, content, tags
-- Read/search notes by content, tags
-- Update note title, content, tags
-- Delete notes by ID
+### AI Elements Usage Policy
 
-**2. AI Agent Integration**:
-- Kilo SDK for AI gateway
-- Claude Sonnet 3.5 model
-- 6 tool definitions for notes
-- Guardrails in AGENTS.md
+Currently approved usage in the app:
+- `Conversation`
+- `PromptInput`
 
-**3. Real-time Sync**:
-- Convex subscriptions for live updates
-- Notes panel updates automatically
-- No manual refresh needed
+Currently avoided in production build:
+- `message.tsx` / `MessageResponse` path from AI Elements, because the current Windows + Turbopack environment hits a `shiki/streamdown` junction panic
 
-**4. Thread Management**:
-- Multiple conversation threads
-- Thread persistence
-- Thread switching
+This means:
+- AI Elements are part of the active UI stack
+- but only the stable subset is used in the main UI right now
 
-### User Interactions
+## Notes Panel Specification
 
-1. **Creating a note**: User asks AI to remember something → AI calls save_note → Note appears in panel
-2. **Searching notes**: User asks about specific content → AI calls search_notes → Shows relevant notes
-3. **Updating**: User requests changes → AI calls update_note → Note updates in real-time
-4. **Deleting**: User requests deletion → AI calls delete_note → Note removed from panel
+The right panel is a live notes browser.
 
-### Data Handling
+Expected behavior:
+- show notes returned from Convex in real time
+- show title first
+- show compact content snippet
+- show tags
+- show feature badges for markdown-heavy content when present
 
-**Note Schema**:
+Current feature badges:
+- code
+- table
+- task list
+
+Snippet rules:
+- strip markdown noise where possible
+- keep preview readable instead of literal raw markdown syntax
+
+## Note Editor Specification
+
+### Design Goal
+
+The note editor should feel like a document workspace, not a plain CRUD modal.
+
+### Current Editor UI
+
+Implemented in the current UI layer:
+- title field
+- markdown formatting toolbar
+- write / preview / split modes
+- metadata rail
+- sync/document status visuals
+- markdown-oriented preview surface
+
+### Current Rendering State
+
+The current preview renderer is a lightweight in-app renderer intended to move the UI forward quickly.
+
+It supports:
+- headings
+- blockquotes
+- bullet and ordered lists
+- task lists
+- tables
+- fenced code blocks
+- inline emphasis and links
+
+It is not yet the final production-grade GFM renderer.
+
+### Target V1 Editor Direction
+
+- GitHub-first Markdown authoring
+- separate title/tags editing from document body
+- preview surfaces that feel trustworthy
+- sync feedback that is always visible
+- room for future Obsidian-like features without implementing them yet
+
+## Data Model Specification
+
+### Current Note Schema
+
 ```typescript
 {
   _id: Id<"notes">
@@ -130,32 +186,79 @@
 }
 ```
 
-**Thread Schema**:
+### Planned Note Schema Extensions
+
 ```typescript
 {
-  _id: Id<"threads">
-  title: string
-  messages: Message[]
-  createdAt: number
-  updatedAt: number
+  contentFormat: "markdown"
+  contentVersion: number
+  lastSyncedAt?: number
+  updatedByClientId?: string
 }
 ```
 
-### Edge Cases
-- Empty notes list → Show "No notes yet" message
-- Search with no results → Show "No matching notes found"
-- Network issues → Show connection status
-- Very long notes → Truncate in preview, full in detail
+These fields are planned but not yet fully implemented in the backend.
+
+## Functionality Specification
+
+### Core Features
+
+**1. AI Note Operations**
+- create notes
+- search notes
+- list notes
+- filter notes by tag
+- update notes
+- delete notes
+
+**2. Real-Time Note Visibility**
+- notes panel updates from Convex-backed state
+- no manual refresh required for the main browsing flow
+
+**3. Markdown Workspace Direction**
+- users can edit note content in a richer editor
+- note previews are more document-like than before
+- editor architecture is moving toward markdown-first behavior
+
+**4. Cloud-First Sync Roadmap**
+- Convex remains the source of truth
+- local draft behavior will be additive, not a replacement for cloud sync
 
 ## Acceptance Criteria
 
-1. ✅ Three-panel layout renders correctly
-2. ✅ Chat interface allows sending messages
-3. ✅ AI responds with note operations
-4. ✅ Notes panel shows real-time updates via Convex
-5. ✅ All 6 CRUD tools work correctly
-6. ✅ Thread sidebar allows switching conversations
-7. ✅ Tool results display as visual cards
-8. ✅ Environment variables configured correctly
-9. ✅ TypeScript compiles without errors
-10. ✅ ESLint passes without errors
+### Current Acceptance
+
+1. The three-panel workspace renders correctly.
+2. Chat requests can create and update notes through the AI assistant.
+3. Notes appear in the notes panel and stay browseable.
+4. The main app theme uses the shared black/teal/aurora token system.
+5. The note editor exposes write, preview, and split workflows.
+6. The main chat UI uses stable AI Elements primitives without breaking build reliability.
+7. `bun run build` passes.
+8. `bun run typecheck` passes.
+
+### V1 Markdown + Sync Acceptance
+
+1. Users can author notes in GitHub-style Markdown without falling back to plain textarea-only workflows.
+2. Existing notes remain backward compatible during rollout.
+3. Sync state is visible and understandable.
+4. Local drafts can be recovered safely.
+5. Concurrent edits do not silently overwrite each other.
+6. The architecture remains open for future Obsidian-style extensions.
+
+## Known Constraints
+
+- The current environment has shown Bun dependency-linking issues on Windows during local recovery work.
+- The current environment has shown a Windows Turbopack panic when importing the AI Elements `message.tsx` path that pulls `shiki/streamdown`.
+- Because of that, AI Elements are being adopted incrementally rather than all at once.
+
+## Source of Truth Documents
+
+The spec should be read together with:
+- [`TODO.md`](D:\dev\26\note-taker-convex-ai-convex\TODO.md)
+- [`EDITOR-DESIGN.md`](D:\dev\26\note-taker-convex-ai-convex\EDITOR-DESIGN.md)
+
+These documents define:
+- execution checklist
+- editor UX contract
+- markdown and sync roadmap
