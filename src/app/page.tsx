@@ -230,7 +230,7 @@ export default function Home() {
                   <p className="text-sm text-neutral-400">
                     Ask me to remember something, and I&apos;ll save it for you.
                   </p>
-                  <p className="text-xs uppercase tracking-[0.24em] text-neutral-500">
+                  <p className="text-xs uppercase tracking-[0.24em] text-neutral-400">
                     Try: &quot;Remember my meeting is at 2pm Tuesday&quot;
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export default function Home() {
             onSubmit={({ text }) => handleSendMessage(text)}
           >
             <PromptInputTextarea
-              className="min-h-[48px] sm:min-h-[64px] border-0 bg-transparent px-3 sm:px-4 py-3 text-sm leading-6 text-white placeholder:text-neutral-500"
+              className="min-h-[48px] sm:min-h-[64px] border-0 bg-transparent px-3 sm:px-4 py-3 text-sm leading-6 text-white placeholder:text-neutral-400"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -281,7 +281,7 @@ export default function Home() {
               disabled={isLoading}
             />
             <div className="flex items-center justify-between border-t border-white/8 px-3 py-2">
-              <p className="hidden sm:block text-xs uppercase tracking-[0.22em] text-neutral-500">
+              <p className="hidden sm:block text-xs uppercase tracking-[0.22em] text-neutral-400">
                 {isLoading ? "Assistant is working" : "Enter to send, Shift+Enter for newline"}
               </p>
               <PromptInputSubmit
@@ -299,7 +299,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("menu")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "menu" ? "text-cyan-400" : "text-neutral-500"
+                mobileView === "menu" ? "text-cyan-400" : "text-neutral-400"
               }`}
             >
               <Menu className="w-5 h-5" />
@@ -308,7 +308,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("chat")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "chat" ? "text-cyan-400" : "text-neutral-500"
+                mobileView === "chat" ? "text-cyan-400" : "text-neutral-400"
               }`}
             >
               <MessageSquare className="w-5 h-5" />
@@ -317,7 +317,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("notes")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "notes" ? "text-cyan-400" : "text-neutral-500"
+                mobileView === "notes" ? "text-cyan-400" : "text-neutral-400"
               }`}
             >
               <StickyNote className="w-5 h-5" />

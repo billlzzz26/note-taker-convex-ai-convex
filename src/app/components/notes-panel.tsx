@@ -48,7 +48,7 @@ export function NotesPanel({ notes, onSave, onDelete, onClose, isMobileOverlay }
       <div className="p-3 border-b border-neutral-800 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold text-white">Notes</h2>
-          <p className="text-xs text-neutral-500">{localNotes.length} notes</p>
+          <p className="text-xs text-neutral-400">{localNotes.length} notes</p>
         </div>
         <div className="flex items-center gap-1">
           <button

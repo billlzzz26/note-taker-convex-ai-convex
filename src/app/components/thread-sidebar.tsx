@@ -44,7 +44,7 @@ export function ThreadSidebar({
       </div>
       <div className="flex-1 overflow-y-auto p-2">
         {threads.length === 0 ? (
-          <p className="text-neutral-500 text-sm p-2">No conversations yet</p>
+          <p className="text-neutral-400 text-sm p-2">No conversations yet</p>
         ) : (
           <ul className="space-y-1">
             {threads.map((thread) => (

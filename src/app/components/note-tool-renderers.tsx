@@ -73,7 +73,7 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
               </summary>
               <div className="space-y-3 border-t border-white/8 p-3">
                 <div>
-                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
                     Arguments
                   </p>
                   <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
@@ -81,7 +81,7 @@ export function NoteToolRenderers({ toolCalls }: NoteToolRenderersProps) {
                   </pre>
                 </div>
                 <div>
-                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-500">
+                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
                     Result
                   </p>
                   <pre className="overflow-x-auto rounded-xl border border-white/8 bg-black/40 p-3 text-xs leading-6 text-neutral-300">
