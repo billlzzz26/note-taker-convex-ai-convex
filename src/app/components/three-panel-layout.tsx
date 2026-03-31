@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { FileText, PenLine, MessageSquare, Plus, Search, Menu } from "lucide-react";
 
 type Panel = "sidebar" | "main" | "right";
 
@@ -10,25 +11,49 @@ interface ThreePanelLayoutProps {
   main: ReactNode;
   right: ReactNode;
   defaultPanel?: Panel;
+  onNewNote?: () => void;
+  onSearch?: () => void;
+  onMenu?: () => void;
 }
 
-const PANELS: Panel[] = ["sidebar", "main", "right"];
-const PANEL_LABELS: Record<Panel, string> = {
-  sidebar: "Notes",
-  main: "Editor",
-  right: "Chat",
-};
+const PANELS: { id: Panel; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "sidebar", label: "Notes", icon: FileText },
+  { id: "main", label: "Editor", icon: PenLine },
+  { id: "right", label: "Chat", icon: MessageSquare },
+];
 
 export function ThreePanelLayout({
   sidebar,
   main,
   right,
   defaultPanel = "main",
+  onNewNote,
+  onSearch,
+  onMenu,
 }: ThreePanelLayoutProps) {
   const [active, setActive] = useState<Panel>(defaultPanel);
 
   return (
     <div className="flex h-full flex-col bg-neutral-950">
+      {/* Top tab bar (mobile only) */}
+      <nav className="flex border-b border-neutral-800 bg-neutral-900 lg:hidden">
+        {PANELS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActive(id)}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors min-h-[44px]",
+              active === id
+                ? "text-[color:var(--accent-teal)] border-b-2 border-[color:var(--accent-teal)]"
+                : "text-neutral-400"
+            )}
+          >
+            <Icon className="size-4" />
+            {label}
+          </button>
+        ))}
+      </nav>
+
       {/* Panel content */}
       <div className="flex-1 overflow-hidden">
         {/* Mobile: show active panel only */}
@@ -56,22 +81,29 @@ export function ThreePanelLayout({
         </div>
       </div>
 
-      {/* Bottom tab bar */}
-      <nav className="flex border-t border-neutral-800 bg-neutral-900 lg:hidden">
-        {PANELS.map((panel) => (
-          <button
-            key={panel}
-            onClick={() => setActive(panel)}
-            className={cn(
-              "flex-1 py-3 text-xs font-medium transition-colors min-h-[48px]",
-              active === panel
-                ? "text-[color:var(--accent-teal)]"
-                : "text-neutral-400"
-            )}
-          >
-            {PANEL_LABELS[panel]}
-          </button>
-        ))}
+      {/* Bottom action bar (mobile only) */}
+      <nav className="flex items-center justify-around border-t border-neutral-800 bg-neutral-900 px-4 py-2 lg:hidden">
+        <button
+          onClick={onMenu}
+          className="flex items-center justify-center size-11 rounded-xl text-neutral-400 hover:text-[color:var(--accent-teal)] transition-colors"
+          aria-label="Menu"
+        >
+          <Menu className="size-5" />
+        </button>
+        <button
+          onClick={onNewNote}
+          className="flex items-center justify-center size-11 rounded-full bg-[color:var(--accent-teal)] text-black hover:bg-[color:var(--accent-teal-dim)] transition-colors"
+          aria-label="New note"
+        >
+          <Plus className="size-5" />
+        </button>
+        <button
+          onClick={onSearch}
+          className="flex items-center justify-center size-11 rounded-xl text-neutral-400 hover:text-[color:var(--accent-teal)] transition-colors"
+          aria-label="Search"
+        >
+          <Search className="size-5" />
+        </button>
       </nav>
     </div>
   );

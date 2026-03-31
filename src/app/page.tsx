@@ -227,6 +227,9 @@ export default function Home() {
         main={editorPanel}
         right={chatPanel}
         defaultPanel="main"
+        onNewNote={() => setActiveNote(null)}
+        onSearch={() => {}}
+        onMenu={() => {}}
       />
     </div>
   );
