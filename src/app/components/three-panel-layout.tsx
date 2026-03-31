@@ -92,7 +92,7 @@ export function ThreePanelLayout({
         </button>
         <button
           onClick={onNewNote}
-          className="flex items-center justify-center size-11 rounded-full bg-[color:var(--accent-teal)] text-black hover:bg-[color:var(--accent-teal-dim)] transition-colors"
+          className="flex items-center justify-center size-11 rounded-xl text-neutral-400 hover:text-[color:var(--accent-teal)] transition-colors"
           aria-label="New note"
         >
           <Plus className="size-5" />
