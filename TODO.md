@@ -113,6 +113,15 @@ V1 goals:
 - [x] Created test runner script and README for E2E tests
 - [x] Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
 
+## 2026-04-01 (Early Morning Session)
+
+- [x] Reviewed note-editor.tsx (1067 lines) — identified Phase 3 implementation points
+- [x] Created AGENTS.md with build/lint/test commands, code style, and project structure
+- [x] Updated TODO.md with current session tracking
+- [ ] Next: Extend SyncState type (line 74) to include "saving" | "sync_error"
+- [ ] Next: Add Loader2 icon import and update SyncStatusChip component
+- [ ] Next: Implement debounced autosave and localStorage draft persistence
+
 ## Release readiness checklist
 
 - [ ] Verify backward compatibility end to end in a seeded environment.

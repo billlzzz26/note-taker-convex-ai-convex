@@ -52,6 +52,9 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Updated TODO.md — marked Phase 1 (8/10) and Phase 5 (8/8) items as completed
 - [x] Mobile-first responsive layout: bottom tab bar (Menu/Chat/Notes) on mobile, slide-over panels, useMediaQuery hook
 - [x] Fixed touch targets to min 44px for toolbar, tag, and delete buttons on mobile
+- [x] Added sync metadata to notes schema: contentFormat, contentVersion, lastSyncedAt, updatedByClientId
+- [x] Implemented optimistic concurrency in updateNote with version conflict detection
+- [x] Updated Note interface and all CRUD functions for backward compatibility
 
 ## Current Structure
 
@@ -108,13 +111,16 @@ The current app is functional, but the next planned product phase is a Markdown 
 | 2026-03-30 | Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg) |
 | 2026-03-31 | Hardened note-fetching paths against SSRF findings by routing client note reads through `/api/notes` and validating supported Convex actions server-side |
 | 2026-03-31 | Added `/api/convex` as an allow-listed server-side proxy so the shared Convex helper no longer performs direct outbound URL composition |
+| 2026-04-01 | Reviewed note-editor.tsx (1067 lines) for Phase 3 implementation; identified SyncState extension points, SyncStatusChip updates, and autosave integration points |
+| 2026-04-01 | Created AGENTS.md with build/lint/test commands, code style guidelines, project structure, and key patterns |
+| 2026-04-01 | Updated TODO.md with session tracking for Phase 3 preparation |
 
 ## Pending Items
 
-- [ ] Implement the UI architecture described in `EDITOR-DESIGN.md`
+- [ ] Implement Phase 3: autosave, local drafts, and sync state UI (current focus)
 - [ ] Execute the remaining `TODO.md` Phase 1 items for production-ready Markdown behavior
-- [ ] Extend Convex schema and note types for markdown sync metadata
-- [ ] Implement autosave, local drafts, and conflict-safe sync flow
+- [ ] Implement conflict-safe cloud sync (Phase 4)
+- [ ] Design Obsidian-ready extension points (Phase 6)
+- [ ] Add unit/component tests for editor, autosave, and conflict handling
 - [ ] Run `npx convex dev` to set up Convex backend
 - [ ] Deploy agent to Kilo platform
-- [ ] Configure CONVEX_URL in Kilo dashboard environment variables
