@@ -16,19 +16,11 @@ import { ThreadSidebar } from "./components/thread-sidebar";
 import { NotesPanel } from "./components/notes-panel";
 import { NoteToolRenderers } from "./components/note-tool-renderers";
 import { chat, type Message, type ToolCallResult } from "./components/agents/note-taker";
+import { type Note } from "@/components/ui/note-editor";
 
 interface Thread {
   id: string;
   title: string;
-}
-
-interface Note {
-  _id: string;
-  title: string;
-  content: string;
-  tags: string[];
-  createdAt: number;
-  updatedAt: number;
 }
 
 export default function Home() {
@@ -120,6 +112,37 @@ export default function Home() {
       ]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSaveNote = async (data: Partial<Note>) => {
+    const action = data._id ? "updateNote" : "saveNote";
+    try {
+      const response = await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, args: data }),
+      });
+      if (response.ok) {
+        await fetchNotes();
+      }
+    } catch (error) {
+      console.error("Save note error:", error);
+    }
+  };
+
+  const handleDeleteNote = async (id: string) => {
+    try {
+      const response = await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "deleteNote", args: { _id: id } }),
+      });
+      if (response.ok) {
+        await fetchNotes();
+      }
+    } catch (error) {
+      console.error("Delete note error:", error);
     }
   };
 
@@ -220,7 +243,7 @@ export default function Home() {
         </div>
       </div>
 
-      <NotesPanel notes={notes} />
+      <NotesPanel notes={notes} onSave={handleSaveNote} onDelete={handleDeleteNote} />
     </div>
   );
 }

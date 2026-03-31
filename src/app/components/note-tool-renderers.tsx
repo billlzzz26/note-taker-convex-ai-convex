@@ -1,7 +1,5 @@
 "use client";
 
-import React, { FC, ReactNode } from "react";
-
 interface ToolCall {
   toolName: string;
   args: Record<string, unknown>;

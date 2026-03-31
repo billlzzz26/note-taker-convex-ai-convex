@@ -11,15 +11,16 @@ V1 goals:
 ## Phase 1: Editor foundation
 
 - [ ] Choose a markdown editor stack that supports GFM well and can be extended later for Obsidian-style syntax.
-- [ ] Extract the current note editing experience from the existing dialog into a dedicated markdown editor component.
-- [ ] Add source mode for raw markdown editing.
-- [ ] Add preview mode for rendered markdown.
-- [ ] Add split view mode for editing and preview side by side.
-- [ ] Add a formatting toolbar for headings, bold, italic, code, quote, bullet list, ordered list, task list, table, and links.
-- [ ] Support fenced code blocks with syntax highlighting in preview.
+- [x] Extract the current note editing experience from the existing dialog into a dedicated markdown editor component.
+- [x] Add source mode for raw markdown editing.
+- [x] Add preview mode for rendered markdown.
+- [x] Add split view mode for editing and preview side by side.
+- [x] Add a formatting toolbar for headings, bold, italic, code, quote, bullet list, ordered list, task list, table, and links.
+- [x] Support fenced code blocks with syntax highlighting in preview.
 - [ ] Ensure paste behavior preserves markdown-friendly content where possible.
-- [ ] Keep title and tags editing separate from the markdown document body.
-- [ ] Add acceptance check: users can create and edit notes with standard GFM content without falling back to plain textarea-only workflows.
+- [x] Keep title and tags editing separate from the markdown document body.
+- [x] Integrate NoteEditorDialog and NotesList into the notes panel with CRUD callbacks.
+- [x] Add acceptance check: users can create and edit notes with standard GFM content without falling back to plain textarea-only workflows.
 
 ## Phase 2: Persistence and schema changes
 
@@ -56,14 +57,14 @@ V1 goals:
 
 ## Phase 5: Reader, search, and notes list updates
 
-- [ ] Reuse the markdown rendering pipeline for note preview surfaces where appropriate.
-- [ ] Strip or normalize markdown for compact snippets in the notes panel.
-- [ ] Improve note search so markdown content remains searchable without rendering full documents.
-- [ ] Generate cleaner preview text for headings, lists, and code-heavy notes.
-- [ ] Add lightweight visual cues for notes containing code blocks.
-- [ ] Add lightweight visual cues for notes containing tables.
-- [ ] Add lightweight visual cues for notes containing task lists.
-- [ ] Add acceptance check: notes remain easy to browse and search after markdown support is enabled.
+- [x] Reuse the markdown rendering pipeline for note preview surfaces where appropriate.
+- [x] Strip or normalize markdown for compact snippets in the notes panel.
+- [x] Improve note search so markdown content remains searchable without rendering full documents.
+- [x] Generate cleaner preview text for headings, lists, and code-heavy notes.
+- [x] Add lightweight visual cues for notes containing code blocks.
+- [x] Add lightweight visual cues for notes containing tables.
+- [x] Add lightweight visual cues for notes containing task lists.
+- [x] Add acceptance check: notes remain easy to browse and search after markdown support is enabled.
 
 ## Phase 6: Obsidian-ready extension points
 
