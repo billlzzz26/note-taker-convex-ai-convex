@@ -379,7 +379,7 @@ function ToolbarButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="border border-transparent text-[color:var(--warm-grey-light)] hover:border-[color:var(--glass-border)] hover:bg-[color:var(--glass)] hover:text-[color:var(--accent-teal)]"
+      className="min-h-[44px] min-w-[44px] sm:min-h-[28px] sm:min-w-[28px] border border-transparent text-[color:var(--warm-grey-light)] hover:border-[color:var(--glass-border)] hover:bg-[color:var(--glass)] hover:text-[color:var(--accent-teal)]"
     >
       <Icon className="size-4" />
     </Button>
@@ -756,7 +756,7 @@ export function NoteEditorDialog({
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => addTag(newTag)}
-                          className="text-[color:var(--accent-teal)] hover:bg-[color:var(--glass)]"
+                          className="min-h-[44px] min-w-[44px] sm:min-h-[28px] sm:min-w-[28px] text-[color:var(--accent-teal)] hover:bg-[color:var(--glass)]"
                         >
                           <Check className="size-4" />
                         </Button>
@@ -1018,7 +1018,7 @@ export function NotesList({ notes, onEdit, onDelete }: NotesListProps) {
                         event.stopPropagation();
                         onDelete(note._id);
                       }}
-                      className="text-[color:var(--warm-grey-light)] hover:bg-[color:var(--glass)] hover:text-[color:var(--aurora-red)]"
+                      className="min-h-[44px] min-w-[44px] sm:min-h-[28px] sm:min-w-[28px] text-[color:var(--warm-grey-light)] hover:bg-[color:var(--glass)] hover:text-[color:var(--aurora-red)]"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
