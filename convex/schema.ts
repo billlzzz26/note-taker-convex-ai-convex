@@ -8,8 +8,13 @@ export default defineSchema({
     tags: v.array(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
+    contentFormat: v.optional(v.string()),
+    contentVersion: v.optional(v.number()),
+    lastSyncedAt: v.optional(v.number()),
+    updatedByClientId: v.optional(v.string()),
   }).index("by_createdAt", ["createdAt"])
-    .index("by_tags", ["tags"]),
+    .index("by_tags", ["tags"])
+    .index("by_contentVersion", ["contentVersion"]),
 
   threads: defineTable({
     title: v.string(),

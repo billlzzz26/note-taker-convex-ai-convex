@@ -46,6 +46,8 @@ export const saveNote = mutation({
     title: v.string(),
     content: v.string(),
     tags: v.array(v.string()),
+    contentFormat: v.optional(v.string()),
+    updatedByClientId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -55,6 +57,10 @@ export const saveNote = mutation({
       tags: args.tags,
       createdAt: now,
       updatedAt: now,
+      contentFormat: args.contentFormat ?? "markdown",
+      contentVersion: 1,
+      lastSyncedAt: now,
+      updatedByClientId: args.updatedByClientId,
     });
     return noteId;
   },
@@ -66,16 +72,29 @@ export const updateNote = mutation({
     title: v.optional(v.string()),
     content: v.optional(v.string()),
     tags: v.optional(v.array(v.string())),
+    expectedVersion: v.optional(v.number()),
+    updatedByClientId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    const { id, expectedVersion, updatedByClientId, ...updates } = args;
     const note = await ctx.db.get(id);
     if (!note) {
       throw new Error("Note not found");
     }
+
+    if (expectedVersion !== undefined && note.contentVersion !== expectedVersion) {
+      throw new Error(
+        `CONFLICT: expected version ${expectedVersion}, but current version is ${note.contentVersion}`
+      );
+    }
+
+    const now = Date.now();
     await ctx.db.patch(id, {
       ...updates,
-      updatedAt: Date.now(),
+      updatedAt: now,
+      contentVersion: (note.contentVersion ?? 0) + 1,
+      lastSyncedAt: now,
+      updatedByClientId,
     });
     return id;
   },

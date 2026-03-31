@@ -24,16 +24,16 @@ V1 goals:
 
 ## Phase 2: Persistence and schema changes
 
-- [ ] Add `contentFormat` to the note schema with a v1 default of `"markdown"`.
-- [ ] Add `contentVersion` to support optimistic concurrency and sync safety.
-- [ ] Add `lastSyncedAt` to track cloud sync status.
-- [ ] Add `updatedByClientId` to identify the last writing client.
-- [ ] Update note TypeScript types to include the new sync and document metadata.
-- [ ] Update `saveNote` to persist markdown metadata for newly created notes.
-- [ ] Update `updateNote` to require and validate the current document version.
-- [ ] Update note-fetching queries to return the new metadata fields.
-- [ ] Define a backward-compatible default for legacy notes that only have raw `content`.
-- [ ] Add acceptance check: existing notes still load correctly after schema changes.
+- [x] Add `contentFormat` to the note schema with a v1 default of `"markdown"`.
+- [x] Add `contentVersion` to support optimistic concurrency and sync safety.
+- [x] Add `lastSyncedAt` to track cloud sync status.
+- [x] Add `updatedByClientId` to identify the last writing client.
+- [x] Update note TypeScript types to include the new sync and document metadata.
+- [x] Update `saveNote` to persist markdown metadata for newly created notes.
+- [x] Update `updateNote` to require and validate the current document version.
+- [x] Update note-fetching queries to return the new metadata fields.
+- [x] Define a backward-compatible default for legacy notes that only have raw `content`.
+- [x] Add acceptance check: existing notes still load correctly after schema changes.
 
 ## Phase 3: Autosave and local draft support
 

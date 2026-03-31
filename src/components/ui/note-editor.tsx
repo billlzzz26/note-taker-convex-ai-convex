@@ -56,6 +56,10 @@ export interface Note {
   tags: string[];
   createdAt: number;
   updatedAt: number;
+  contentFormat?: string;
+  contentVersion?: number;
+  lastSyncedAt?: number;
+  updatedByClientId?: string;
 }
 
 interface NoteEditorProps {
