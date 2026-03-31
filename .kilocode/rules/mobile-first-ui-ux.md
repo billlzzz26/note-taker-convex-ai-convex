@@ -1,5 +1,16 @@
 # Mobile-First UI/UX Rules
 
+## Golden Rule: Mobile First Always
+
+**Every UI change must be mobile-first.** Start with the smallest screen, then scale up. Never design for desktop first and adapt down.
+
+- Base CSS = mobile layout
+- Add `sm:` `md:` `lg:` progressively for larger screens
+- Test mobile layout before desktop layout
+- If a component works on mobile, it will work on desktop. The reverse is not true.
+
+---
+
 ## Core Principles
 
 ### 1. Design for Mobile First
