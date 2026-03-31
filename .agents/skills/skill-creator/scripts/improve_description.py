@@ -50,17 +50,19 @@ def _build_improvement_prompt(
     test_results: dict | None,
 ) -> str:
     failed_triggers = [
-        r for r in eval_results["results"]
-        if r["should_trigger"] and not r["pass"]
+        r for r in eval_results["results"] if r["should_trigger"] and not r["pass"]
     ]
     false_triggers = [
-        r for r in eval_results["results"]
-        if not r["should_trigger"] and not r["pass"]
+        r for r in eval_results["results"] if not r["should_trigger"] and not r["pass"]
     ]
 
-    train_score = f"{eval_results['summary']['passed']}/{eval_results['summary']['total']}"
+    train_score = (
+        f"{eval_results['summary']['passed']}/{eval_results['summary']['total']}"
+    )
     if test_results:
-        test_score = f"{test_results['summary']['passed']}/{test_results['summary']['total']}"
+        test_score = (
+            f"{test_results['summary']['passed']}/{test_results['summary']['total']}"
+        )
         scores_summary = f"Train: {train_score}, Test: {test_score}"
     else:
         scores_summary = f"Train: {train_score}"
@@ -96,8 +98,10 @@ Current scores ({scores_summary}):
             test_value = None
             if attempt.get("test_passed") is not None:
                 test_value = f"{attempt.get('test_passed', '?')}/{attempt.get('test_total', '?')}"
-            score_str = f"train={train_value}" + (f", test={test_value}" if test_value else "")
-            prompt += f'<attempt {score_str}>\n'
+            score_str = f"train={train_value}" + (
+                f", test={test_value}" if test_value else ""
+            )
+            prompt += f"<attempt {score_str}>\n"
             prompt += f'Description: "{attempt["description"]}"\n'
             if "results" in attempt:
                 prompt += "Train results:\n"
@@ -105,7 +109,7 @@ Current scores ({scores_summary}):
                     status = "PASS" if result["pass"] else "FAIL"
                     prompt += f'  [{status}] "{result["query"][:80]}" (triggered {result["triggers"]}/{result["runs"]})\n'
             if attempt.get("note"):
-                prompt += f'Note: {attempt["note"]}\n'
+                prompt += f"Note: {attempt['note']}\n"
             prompt += "</attempt>\n\n"
 
     prompt += f"""</scores_summary>
@@ -227,7 +231,9 @@ def _call_codex(prompt: str, model: str | None) -> ProviderResponse:
             last_text = event["item"].get("text", "")
 
     if last_text is None:
-        raise RuntimeError(f"Codex optimizer did not return an agent message. stderr={result.stderr.strip()}")
+        raise RuntimeError(
+            f"Codex optimizer did not return an agent message. stderr={result.stderr.strip()}"
+        )
 
     return ProviderResponse(
         provider="codex",
@@ -252,7 +258,9 @@ def _call_claude_code(prompt: str, model: str | None) -> ProviderResponse:
     result = _run_subprocess(cmd, prompt, env=env)
     text = result.stdout.strip()
     if not text:
-        raise RuntimeError(f"Claude Code optimizer returned empty output. stderr={result.stderr.strip()}")
+        raise RuntimeError(
+            f"Claude Code optimizer returned empty output. stderr={result.stderr.strip()}"
+        )
 
     return ProviderResponse(
         provider="claude-code",
@@ -264,8 +272,17 @@ def _call_claude_code(prompt: str, model: str | None) -> ProviderResponse:
 
 def _call_openclaw(prompt: str, openclaw_agent: str) -> ProviderResponse:
     """Call OpenClaw in local agent mode."""
+    # Validate agent name to prevent command injection
+    if not re.match(r"^[a-zA-Z0-9_-]+$", openclaw_agent):
+        raise ValueError(f"Invalid openclaw agent name: {openclaw_agent!r}")
+
+    ALLOWED_OPENCLAW_COMMANDS = ["openclaw"]
+    executable = shutil.which("openclaw")
+    if executable is None:
+        raise RuntimeError("openclaw command not found in PATH")
+
     cmd = [
-        "openclaw",
+        executable,
         "agent",
         "--local",
         "--agent",
@@ -320,7 +337,9 @@ def resolve_optimizer_platform(optimizer_platform: str, eval_platform: str) -> s
     if anthropic is not None:
         return "anthropic"
 
-    raise RuntimeError("Unable to resolve an optimizer runtime. Install codex/claude/openclaw or Anthropics SDK.")
+    raise RuntimeError(
+        "Unable to resolve an optimizer runtime. Install codex/claude/openclaw or Anthropics SDK."
+    )
 
 
 def _request_provider_response(
@@ -417,19 +436,37 @@ def improve_description(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Improve a skill description based on eval results")
-    parser.add_argument("--eval-results", required=True, help="Path to eval results JSON (from run_eval.py)")
+    parser = argparse.ArgumentParser(
+        description="Improve a skill description based on eval results"
+    )
+    parser.add_argument(
+        "--eval-results",
+        required=True,
+        help="Path to eval results JSON (from run_eval.py)",
+    )
     parser.add_argument("--skill-path", required=True, help="Path to skill directory")
-    parser.add_argument("--history", default=None, help="Path to history JSON (previous attempts)")
-    parser.add_argument("--model", default=None, help="Model override for runtimes that support it")
+    parser.add_argument(
+        "--history", default=None, help="Path to history JSON (previous attempts)"
+    )
+    parser.add_argument(
+        "--model", default=None, help="Model override for runtimes that support it"
+    )
     parser.add_argument(
         "--optimizer-platform",
         choices=["auto", "claude-code", "openclaw", "codex", "anthropic"],
         default="auto",
         help="Runtime used to rewrite descriptions",
     )
-    parser.add_argument("--openclaw-agent", default="main", help="OpenClaw agent id when using the OpenClaw optimizer")
-    parser.add_argument("--verbose", action="store_true", help="Print selected optimizer details to stderr")
+    parser.add_argument(
+        "--openclaw-agent",
+        default="main",
+        help="OpenClaw agent id when using the OpenClaw optimizer",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print selected optimizer details to stderr",
+    )
     args = parser.parse_args()
 
     skill_path = Path(args.skill_path)
@@ -447,7 +484,10 @@ def main():
 
     if args.verbose:
         print(f"Current: {current_description}", file=sys.stderr)
-        print(f"Score: {eval_results['summary']['passed']}/{eval_results['summary']['total']}", file=sys.stderr)
+        print(
+            f"Score: {eval_results['summary']['passed']}/{eval_results['summary']['total']}",
+            file=sys.stderr,
+        )
 
     new_description = improve_description(
         skill_name=name,
@@ -465,13 +505,16 @@ def main():
 
     output = {
         "description": new_description,
-        "history": history + [{
-            "description": current_description,
-            "passed": eval_results["summary"]["passed"],
-            "failed": eval_results["summary"]["failed"],
-            "total": eval_results["summary"]["total"],
-            "results": eval_results["results"],
-        }],
+        "history": history
+        + [
+            {
+                "description": current_description,
+                "passed": eval_results["summary"]["passed"],
+                "failed": eval_results["summary"]["failed"],
+                "total": eval_results["summary"]["total"],
+                "results": eval_results["results"],
+            }
+        ],
     }
     print(json.dumps(output, indent=2))
 
