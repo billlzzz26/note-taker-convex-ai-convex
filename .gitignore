@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local temp recovery artifacts
 .tmp-*/
+
+# Windows reserved device names (accidental redirects)
+nul
