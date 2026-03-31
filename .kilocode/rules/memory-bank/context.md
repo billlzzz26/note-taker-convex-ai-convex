@@ -46,6 +46,10 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Created E2E Playwright tests for main page, thread sidebar, notes panel, and note tool renderers using webapp-testing skill
 - [x] Created test runner script and README for E2E tests
 - [x] Fixed responsive class in note-tool-renderers.tsx (text-lg → sm:text-lg)
+- [x] Integrated NoteEditorDialog and NotesList into notes-panel.tsx with CRUD callbacks
+- [x] Added handleSaveNote and handleDeleteNote to page.tsx
+- [x] Removed unused imports from note-tool-renderers.tsx and thread-sidebar.tsx
+- [x] Updated TODO.md — marked Phase 1 (8/10) and Phase 5 (8/8) items as completed
 
 ## Current Structure
 
