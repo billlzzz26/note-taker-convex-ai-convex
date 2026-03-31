@@ -14,7 +14,11 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "login": "npx @kilocode/cli login",
-    "deploy": "npx @kilocode/cli deploy"
+    "deploy": "npx @kilocode/cli deploy",
+    "clean": "bun clean:next && bun clean:node && bun clean:ruff",
+    "clean:next": "rm -rf .next",
+    "clean:node": "rm -rf node_modules",
+    "clean:ruff": "rm -rf .ruff_cache __pycache__"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.48",
