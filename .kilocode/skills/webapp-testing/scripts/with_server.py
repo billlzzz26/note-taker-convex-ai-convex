@@ -11,14 +11,21 @@ Usage:
     python scripts/with_server.py \
       --server "cd backend && python server.py" --port 3000 \
       --server "cd frontend && npm run dev" --port 5173 \
-      -- python test.py
-"""
+    python scripts/with_server.py --server "npm start" --port 3000 """
 
 import subprocess
 import socket
 import time
 import sys
 import argparse
+
+# Allowlist of commands that can be executed after the servers are ready.
+# The keys are short, user-supplied names; the values are the full command lists.
+# Adjust this mapping as needed for your project.
+ALLOWED_COMMANDS = {
+    "automation": ["python", "automation.py"],
+    "tests": ["python", "test.py"],
+}
 
 
 def is_server_ready(port, timeout=30):
@@ -106,11 +113,23 @@ def main():
 
         print(f"\nAll {len(servers)} server(s) ready")
 
-        # Run the command — validate all args are strings before passing to subprocess
-        command = [str(arg) for arg in args.command if arg]
-        if not command or not command[0]:
+        # Run the command selected from the allowlist
+        raw_args = [str(arg) for arg in args.command if arg]
+        if not raw_args:
             print("Error: Invalid command", file=sys.stderr)
             sys.exit(1)
+
+        command_key = raw_args[0]
+        if command_key not in ALLOWED_COMMANDS:
+            print(
+                f"Error: Command '{command_key}' is not allowed. "
+                f"Allowed commands are: {', '.join(sorted(ALLOWED_COMMANDS.keys()))}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+        # Base command from allowlist, plus any extra user-supplied arguments
+        command = ALLOWED_COMMANDS[command_key] + raw_args[1:]
         print(f"Running: {' '.join(command)}\n")
         result = subprocess.run(command, shell=False)
         sys.exit(result.returncode)
