@@ -299,7 +299,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("menu")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "menu" ? "text-cyan-400" : "text-neutral-400"
+                mobileView === "menu" ? "text-[color:var(--accent-teal)]" : "text-neutral-400"
               }`}
             >
               <Menu className="w-5 h-5" />
@@ -308,7 +308,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("chat")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "chat" ? "text-cyan-400" : "text-neutral-400"
+                mobileView === "chat" ? "text-[color:var(--accent-teal)]" : "text-neutral-400"
               }`}
             >
               <MessageSquare className="w-5 h-5" />
@@ -317,7 +317,7 @@ export default function Home() {
             <button
               onClick={() => setMobileView("notes")}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
-                mobileView === "notes" ? "text-cyan-400" : "text-neutral-400"
+                mobileView === "notes" ? "text-[color:var(--accent-teal)]" : "text-neutral-400"
               }`}
             >
               <StickyNote className="w-5 h-5" />
