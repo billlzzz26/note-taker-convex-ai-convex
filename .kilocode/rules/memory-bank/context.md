@@ -50,6 +50,8 @@ Note Taker AI-powered notebook app built with Next.js, React, Convex, Tailwind C
 - [x] Added handleSaveNote and handleDeleteNote to page.tsx
 - [x] Removed unused imports from note-tool-renderers.tsx and thread-sidebar.tsx
 - [x] Updated TODO.md — marked Phase 1 (8/10) and Phase 5 (8/8) items as completed
+- [x] Mobile-first responsive layout: bottom tab bar (Menu/Chat/Notes) on mobile, slide-over panels, useMediaQuery hook
+- [x] Fixed touch targets to min 44px for toolbar, tag, and delete buttons on mobile
 
 ## Current Structure
 
