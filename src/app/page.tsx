@@ -280,12 +280,9 @@ export default function Home() {
               placeholder="Type a message..."
               disabled={isLoading}
             />
-            <div className="flex items-center justify-between border-t border-white/8 px-3 py-2">
-              <p className="hidden sm:block text-xs uppercase tracking-[0.22em] text-neutral-400">
-                {isLoading ? "Assistant is working" : "Enter to send, Shift+Enter for newline"}
-              </p>
+            <div className="flex items-center justify-end border-t border-white/8 px-3 py-2">
               <PromptInputSubmit
-                className="rounded-full bg-cyan-400 text-black hover:bg-cyan-300"
+                className="rounded-full bg-[color:var(--accent-teal)] text-black hover:bg-[color:var(--accent-teal-dim)]"
                 disabled={!isLoading && !input.trim()}
                 status={isLoading ? "submitted" : "ready"}
               />
